@@ -27,7 +27,7 @@ Việc phát triển dự án mạng xã hội HELIOS được xây dựng dựa
 ### Đối tượng, phạm vi nghiên cứu
 HELIOS hướng đến hai nhóm đối tượng chính:
 - Sinh viên: Có nhu cầu học tập, kết nối bạn bè, tham gia hoạt động ngoại khóa, cuộc thi, dự án.
-- Sinh viên năm cuối (Intern/Fresher): Tìm kiếm cơ hội việc làm, xây dựng CV và phát triển mạng lưới quan hệ.
+- Freelancer/ Người có nhu cầu tiềm việc: Tìm kiếm cơ hội việc làm, xây dựng CV và phát triển mạng lưới quan hệ.
 Điểm đặc biệt là mỗi người dùng có thể vừa là người học, vừa là người kết nối, vừa là người tìm kiếm cơ hội, tạo nên một hệ sinh thái linh hoạt.
 
 ### Mục tiêu hướng đến
