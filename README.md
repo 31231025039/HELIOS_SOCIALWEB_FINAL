@@ -37,6 +37,6 @@ HELIOS được xây dựng với các mục tiêu chính:
 - Tạo không gian học tập sáng tạo.
 
 ## Lời cảm ơn
-Nhóm xin gửi lời cảm ơn chân thành nhất đến TS. Đặng Ngọc Hoàng Thành, người đã tận tâm hướng dẫn và đồng hành cùng nhóm trong suốt quá trình thực hiện đề tài. Những kiến thức và kinh nghiệm tích lũy từ học phần đóng vai trò quan trọng giúp nhóm tạo nên một sản phẩm hoàn chỉnh. Bên cạnh đó, nhóm cũng trân trọng cảm ơn Trường Đại học Kinh tế TP. Hồ Chí Minh (UEH) đã tạo điều kiện về cơ sở vật chất cũng như môi trường học tập thuận lợi để nhóm có thể học tập và nghiên cứu hiệu quả.
+Nhóm xin gửi lời cảm ơn chân thành nhất đến TS. Đặng Ngọc Hoàng Thành, người đã tận tâm hướng dẫn và đồng hành cùng nhóm trong suốt quá trình thực hiện đề tài. Những kiến thức và kinh nghiệm tích lũy từ học phần đóng vai trò quan trọng giúp nhóm tạo nên một sản phẩm hoàn chỉnh. Bên cạnh đó, nhóm cũng trân trọng cảm ơn Đại học Kinh tế Thành phố Hồ Chí Minh (UEH) đã tạo điều kiện về cơ sở vật chất cũng như môi trường học tập thuận lợi để nhóm có thể học tập và nghiên cứu hiệu quả.
 
 
