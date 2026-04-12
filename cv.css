@@ -1,0 +1,189 @@
+:root {
+  --navy: #11408f;
+  --mint: #15cbb7;
+}
+
+/* Body */
+body {
+  background: #f3f8ff;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* Navbar */
+.topbar {
+  background: var(--navy);
+  height: 56px;
+}
+
+.logo-img {
+  height: 32px;
+}
+
+.nav-main {
+  gap: 10px;
+}
+
+.nav-link-item {
+  color: white;
+  text-align: center;
+  font-size: 12px;
+  padding: 6px 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+.nav-link-item i {
+  font-size: 18px;
+}
+
+.nav-link-item.active {
+  border-bottom: 3px solid var(--mint);
+}
+
+/* Hero */
+.cv-hero {
+  background: linear-gradient(135deg, #1e56b0, #11408f);
+  color: white;
+  padding: 30px;
+  border-radius: 12px;
+  text-align: center;
+}
+
+/* Tip box (left) */
+.cv-tip-box {
+  background: linear-gradient(135deg, #2a66c7, #1e56b0);
+  padding: 15px;
+  border-radius: 12px;
+  color: white;
+  border: 1px solid rgba(255,255,255,0.15);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+}
+
+.cv-tip-box div {
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.2);
+  font-weight: 500;
+}
+
+.cv-tip-box div:last-child {
+  border-bottom: none;
+}
+
+/* Side box (right) */
+.cv-side-box {
+  background: #d6f9f4;
+  padding: 20px;
+  border-radius: 12px;
+  color: #0f5d59;
+  border: 1px solid #b6efe7;
+}
+
+/* Hover effects */
+.cv-tip-box:hover,
+.cv-side-box:hover {
+  transform: translateY(-2px);
+  transition: 0.2s;
+}
+
+/* Filter */
+.cv-filter button {
+  border: none;
+  padding: 6px 12px;
+  margin-right: 6px;
+  background: #e3ecf8;
+  border-radius: 20px;
+}
+
+.cv-filter button.active {
+  background: var(--navy);
+  color: white;
+}
+
+/* Grid */
+.row.g-4 {
+  --bs-gutter-x: 18px;
+  --bs-gutter-y: 18px;
+}
+
+/* Card */
+.cv-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #fff;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+}
+
+.cv-card:hover {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 15px 35px rgba(0,0,0,0.12);
+}
+
+/* Image */
+.cv-img {
+  width: 100%;
+  height: 420px;
+  object-fit: cover;
+  transition: 0.4s;
+}
+
+.cv-card:hover .cv-img {
+  filter: brightness(0.65);
+}
+
+/* Overlay */
+.cv-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  opacity: 0;
+  transition: 0.3s;
+  background: linear-gradient(
+    to top,
+    rgba(17,64,143,0.9),
+    rgba(17,64,143,0.4)
+  );
+}
+
+.cv-card:hover .cv-overlay {
+  opacity: 1;
+}
+
+/* Button */
+.btn-mint {
+  background: var(--mint);
+  color: #fff;
+  border: none;
+}
+
+.btn-mint:hover {
+  background: #12b3a2;
+}
+
+/* Badge */
+.cv-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: linear-gradient(45deg, #ff5b6e, #ff7a7a);
+  color: white;
+  font-size: 10px;
+  padding: 4px 8px;
+  border-radius: 20px;
+  font-weight: bold;
+  z-index: 5;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+/* Title */
+.cv-title {
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+  margin-top: 8px;
+}
