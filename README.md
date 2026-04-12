@@ -4,8 +4,7 @@
 - Mã học phần: 26D1INF50901401
 - Giảng viên: TS. Đặng Ngọc Hoàng Thành
 
-
-## Thành viên nhóm 9
+## Các Thành viên nhóm 9
 - Trương Nhật Phương Vy (Nhóm trưởng) - 31231025039 - GitHub: 31231025039
 - Trần Thế Hào - 31221026239 - GitHub: tranhao241204-jpg
 - Nguyễn Thanh Thảo - 31231020747 - GitHub: nthanhthao01
