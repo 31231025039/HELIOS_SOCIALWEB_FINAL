@@ -1,5 +1,6 @@
-/* Page-specific styles for AboutMe.html */
-
+/* =========================================
+   STYLE DÀNH RIÊNG CHO TRANG ABOUT-ME
+========================================= */
 .extra-small { font-size: 11px; }
 
 .profile-cover {
@@ -45,28 +46,16 @@
   margin-bottom: 0 !important;
 }
 
-.profile-intro-details p.mb-1 {
-  margin-bottom: 0.25rem !important;
-}
-.profile-intro-details p.mb-2 {
-  margin-bottom: 0.5rem !important;
-}
+.profile-intro-details p.mb-1 { margin-bottom: 0.25rem !important; }
+.profile-intro-details p.mb-2 { margin-bottom: 0.5rem !important; }
 
-
-.btn-helios-navy-soft {
-  background-color: var(--helios-navy-soft);
-  border-color: var(--helios-navy-soft);
-}
-.btn-helios-navy-soft:hover {
-  background-color: var(--helios-navy);
-  border-color: var(--helios-navy);
-}
-
-.badge.bg-light.text-dark.border {
-    border-color: var(--helios-border) !important;
-    color: var(--helios-text-muted) !important;
-    font-weight: 500;
-    font-size: 13px;
+.company-logo-sm {
+  width: 48px;
+  height: 48px;
+  border-radius: 4px;
+  object-fit: contain;
+  background-color: var(--helios-mint-soft);
+  padding: 5px;
 }
 
 .profile-suggestion-avatar {
@@ -81,35 +70,3 @@
   font-weight: bold;
   flex-shrink: 0;
 }
-
-.company-logo-sm {
-  width: 48px;
-  height: 48px;
-  border-radius: 4px;
-  object-fit: contain;
-  background-color: var(--helios-mint-soft);
-  padding: 5px;
-}
-
-.text-nowrap-md {
-  white-space: normal;
-}
-
-.post-body { font-size: 14px; line-height: 1.5; }
-
-.see-all-btn {
-  border: 1px solid var(--helios-navy);
-  color: var(--helios-navy);
-  background: transparent;
-  padding: 5px;
-  border-radius: 20px;
-  font-weight: 600;
-  font-size: 13px;
-}
-
-@media (min-width: 768px) {
-  .text-nowrap-md {
-    white-space: nowrap !important;
-  }
-}
-
