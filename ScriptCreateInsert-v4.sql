@@ -89,10 +89,10 @@ CREATE TABLE `KinhNghiem` (
 CREATE TABLE `BaiViet` (
     `MaBaiViet` INT AUTO_INCREMENT PRIMARY KEY,
     `NoiDung` TEXT NOT NULL,
-    `LoaiBaiViet` ENUM('post','event') DEFAULT 'post', -- Phân biệt bài viết / sự kiện
-    `TenSuKien` VARCHAR(255) NULL,                     -- Chỉ dùng nếu là event
-    `DiaDiemSuKien` VARCHAR(255) NULL,                 -- Chỉ dùng nếu là event
-    `ThoiGianSuKien` DATETIME NULL,                    -- Chỉ dùng nếu là event
+    `LoaiBaiViet` ENUM('post','event') DEFAULT 'post', 
+    `TenSuKien` VARCHAR(255) NULL,                     
+    `DiaDiemSuKien` VARCHAR(255) NULL,                
+    `ThoiGianSuKien` DATETIME NULL,                    
     `TrangThai` VARCHAR(50) DEFAULT 'Public',
     `ThoiGianDang` DATETIME DEFAULT CURRENT_TIMESTAMP,
     `MaNguoiDung` INT NOT NULL,
@@ -287,7 +287,7 @@ INSERT INTO `BinhLuan` (`NoiDung`, `MaBaiViet`, `MaNguoiDung`) VALUES
 
 -- INSERT 16: TuongTac
 INSERT INTO `TuongTac` (`MaNguoiDung`, `MaBaiViet`, `LoaiTuongTac`) VALUES 
-(4, 1, 'Like'), (5, 1, 'Love'), (1, 2, 'Care');
+(4, 1, 'Thích'), (5, 1, 'Quan tâm'), (1, 2, 'Hữu ích');
 
 -- =========================================================================
 -- KẾT THÚC SCRIPT
