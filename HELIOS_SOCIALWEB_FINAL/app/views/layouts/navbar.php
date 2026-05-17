@@ -37,7 +37,6 @@ $activeNav = $activeNav ?? 'home'; // Mặc định là 'home' nếu không đư
           <a href="<?php echo $baseUrl; ?>noti" class="nav-link-item nav-menu-item position-relative <?php echo ($activeNav == 'noti') ? 'active' : ''; ?>" data-nav="noti">
             <i class="bi bi-bell-fill"></i>
             <span>Thông báo</span>
-            <span class="nav-badge">2</span>
           </a>
           <a href="<?php echo $baseUrl; ?>about-me" class="nav-link-item user-profile-nav border-start <?php echo ($activeNav == 'profile') ? 'active' : ''; ?>" data-nav="profile">
             <div class="nav-avatar-sm">VY</div>
