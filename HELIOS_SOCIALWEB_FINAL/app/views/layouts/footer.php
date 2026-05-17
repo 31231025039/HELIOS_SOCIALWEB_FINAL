@@ -1,0 +1,12 @@
+<?php
+// app/Views/layouts/footer.php
+?>
+<footer class="site-footer border-top py-3 mt-4 small text-center text-muted">
+  <div class="container-xl">
+    <div class="footer-bottom">
+      &copy; 2026 Helios. Tất cả quyền được bảo lưu.
+      <br>
+      Kết nối sinh viên và cơ hội nghề nghiệp
+    </div>
+  </div>
+</footer>
