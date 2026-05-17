@@ -1,0 +1,260 @@
+:root {
+  --helios-navy: #062b6b;
+  --helios-navy-soft: #19386d;
+  --helios-navy-bright: #073d96;
+  --helios-mint: #15cbb7;
+  --helios-mint-soft: #d6f9f4;
+  --helios-bg: #f3f8ff;
+  --helios-border: #d5e1f0;
+  --helios-text-muted: #51657f;
+  --helios-card-radius: 8px;
+  --helios-shadow: 0 0 0 1px rgba(17, 64, 143, 0.08);
+  --primary: var(--helios-navy);
+  --accent: var(--helios-mint);
+  --card-border: var(--helios-border);
+  --text-muted: var(--helios-text-muted);
+  --text-main: #1a1a1a;
+  --shadow-md: 0 4px 14px rgba(6, 43, 107, 0.1);
+  --bg: var(--helios-bg);
+  --text: var(--text-main);
+  --white: #ffffff;
+  --border: var(--helios-border);
+  --radius: var(--helios-card-radius);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  background-color: var(--helios-bg);
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  color: var(--text-main);
+  margin: 0;
+  padding: 0;
+  font-size: 14px;
+}
+
+#site-navbar { min-height: 52px; }
+
+.h-card, .cv-card {
+  background: #fff;
+  border-radius: var(--helios-card-radius);
+  border: 1px solid var(--helios-border);
+  box-shadow: var(--helios-shadow);
+}
+
+/* ===== NAVBAR ===== */
+.topbar {
+  height: 52px;
+  min-height: 52px;
+  z-index: 1000;
+  background: linear-gradient(180deg, #0d4f9e 0%, var(--helios-navy-bright) 42%, var(--helios-navy) 100%) !important;
+  border-bottom: 2px solid rgba(21, 203, 183, 0.38) !important;
+  box-shadow: 0 2px 12px rgba(6, 43, 107, 0.22);
+}
+
+.logo-img {
+  height: 36px;
+  width: auto;
+  max-width: 200px;
+  object-fit: contain;
+  display: block;
+  margin-right: 6px;
+  flex-shrink: 0;
+}
+
+.search-wrap {
+  max-width: 240px;
+  width: 100%;
+  background: #f2f7fd;
+  border-radius: 999px;
+  border: 1px solid #d7e4f2;
+  padding: 0 12px;
+  margin-right: 16px;
+}
+.search-wrap:focus-within { background: #fff; border-color: #72d9ca; }
+.search-wrap .bi-search { color: #4a6b9a !important; }
+.search-wrap input { color: #26364d; }
+.search-wrap input::placeholder { color: #7b8ea9; }
+.search-wrap:focus-within input { color: #223040; }
+.search-wrap:focus-within input::placeholder { color: #728395; }
+
+.nav-main { width: 100%; justify-content: space-between; gap: 0.5rem; }
+.nav-menu-item { flex: 1 1 auto; min-width: 0; }
+
+.nav-link-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 60px;
+  gap: 2px;
+  height: 52px;
+  color: rgba(255, 255, 255, 0.92);
+  text-decoration: none;
+  font-size: 11px;
+  font-weight: 600;
+  transition: color 0.2s, background 0.2s;
+  position: relative;
+  white-space: nowrap;
+  text-align: center;
+}
+.nav-link-item span { line-height: 1; font-weight: 700; letter-spacing: 0.02em; }
+.nav-link-item i { font-size: 20px; line-height: 1; filter: drop-shadow(0 1px 1px rgba(0,0,0,0.22)); }
+.nav-link-item:hover,
+.nav-link-item.active { color: #fff; background: rgba(255,255,255,0.12); }
+.nav-link-item.active::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 3px;
+  background: #15cbb7;
+  box-shadow: 0 0 10px rgba(21,203,183,0.55);
+}
+
+.nav-badge {
+  position: absolute;
+  top: 2px;
+  right: 18px;
+  background: #ff5b6e;
+  color: #fff;
+  font-size: 10px;
+  border-radius: 50%;
+  padding: 2px 5px;
+  font-weight: bold;
+  box-shadow: 0 0 0 1px rgba(17,64,143,0.6);
+}
+
+.user-profile-nav { min-width: 72px; }
+
+.nav-avatar-sm {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #062b6b;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  font-weight: bold;
+}
+
+/* ==========================================================================
+   5. SIDEBAR CHUNG (TRÁI & PHẢI) - DÙNG CHO HOME, NOTI, NETWORK
+========================================================================== */
+
+/* -------- SIDEBAR TRÁI -------- */
+.profile-banner { 
+    height: 60px; 
+    background: var(--helios-mint); 
+    border-radius: var(--helios-card-radius) var(--helios-card-radius) 0 0; 
+}
+.profile-avatar-lg { 
+    width: 72px; height: 72px; border-radius: 50%; border: 4px solid #fff; 
+    background: var(--helios-navy-soft); color: white; display: flex; 
+    align-items: center; justify-content: center; font-size: 20px; 
+    font-weight: bold; margin: -36px auto 10px; position: relative; z-index: 2; 
+}
+.profile-stats .profile-stat-value { 
+    flex-shrink: 0; min-width: 2.5rem; text-align: right; padding-left: 0.5rem; 
+}
+
+/* -------- SIDEBAR PHẢI (QUẢNG CÁO) -------- */
+.skills-sponsored-head { padding: 10px 12px 6px; }
+.sponsored-section-title { font-size: 15px; font-weight: 600; color: #65676b; line-height: 1.2; }
+.skills-sponsored-list { display: flex; flex-direction: column; gap: 4px; padding: 0 12px 8px; }
+.skills-sponsored-footer { padding: 0 12px 12px; }
+
+.skill-promo { border-radius: 10px; transition: background-color 0.15s ease; }
+.skill-promo:hover { background-color: #f0f2f5; }
+.skill-promo-inner { padding: 8px 0 10px; border-radius: 10px; }
+.skill-promo-media { display: flex; justify-content: center; align-items: center; padding: 2px 0 4px; }
+
+.skill-promo-thumb { 
+    position: relative; width: min(100%, 168px); aspect-ratio: 1/1; 
+    max-width: 168px; margin: 0 auto; border-radius: 10px; 
+    overflow: hidden; background: #e4e6eb; flex-shrink: 0; 
+}
+.skill-promo-menu-overlay { position: absolute; top: 6px; right: 6px; z-index: 2; display: flex; gap: 4px; }
+.skill-promo-thumb img { width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; }
+
+.skill-promo-text-block { display: flex; flex-direction: column; gap: 6px; padding-top: 10px; }
+.skill-promo-title-link { text-decoration: none; color: inherit; }
+.skill-promo-title-link:hover .skill-promo-title { text-decoration: underline; color: var(--helios-navy); }
+.skill-promo-title { display: block; font-size: 14px; font-weight: 600; line-height: 1.35; color: #050505; margin: 0; }
+.skill-promo-meta { font-size: 12px; color: #65676b; line-height: 1.4; word-break: break-all; }
+
+.skill-promo-icon-btn { 
+    width: 32px; height: 32px; padding: 0; border: none; border-radius: 50%; 
+    background: transparent; color: #65676b; display: inline-flex; 
+    align-items: center; justify-content: center; cursor: pointer; transition: background 0.15s; 
+}
+.skill-promo-icon-btn--float { background: rgba(255,255,255,0.92); box-shadow: 0 1px 3px rgba(0,0,0,0.18); color: #050505; }
+.skill-promo-icon-btn--float:hover { background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
+
+.skill-promo-cta { 
+    align-self: stretch; border: none; border-radius: 6px; background: #e4e6eb; 
+    color: #050505; font-size: 14px; font-weight: 600; padding: 8px 12px; cursor: pointer; 
+}
+.skill-promo:hover .skill-promo-cta { background: #d8dadf; }
+
+/* -------- SIDEBAR PHẢI (GỢI Ý FOLLOW) -------- */
+.suggest-follow-card { padding: 12px 0 10px; }
+.suggest-follow-head { display: flex; align-items: center; justify-content: space-between; padding: 0 14px 10px; }
+.suggest-follow-title { font-size: 14px; font-weight: 700; color: #050505; }
+.suggest-follow-see-all { font-size: 12px; font-weight: 600; color: var(--helios-navy-bright); text-decoration: none; }
+.suggest-follow-list { list-style: none; padding: 0; margin: 0; }
+.suggest-follow-row { display: flex; align-items: center; gap: 10px; padding: 8px 14px; transition: background 0.12s; }
+.suggest-follow-row:hover { background: #f6f8fa; }
+
+.suggest-follow-avatar { 
+    width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0; color: #fff; 
+    display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; 
+}
+.sfa--navy { background: var(--helios-navy-soft); }
+.sfa--mint { background: linear-gradient(135deg, var(--helios-mint) 0%, #0d9488 100%); }
+.sfa--purple { background: #6d28d9; }
+.sfa--rose { background: #be123c; }
+
+.suggest-follow-meta { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.suggest-follow-name { font-size: 13px; font-weight: 600; color: #050505; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.suggest-follow-reason { font-size: 11px; color: #65676b; line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.suggest-follow-reason strong { font-weight: 600; color: #4a5568; }
+
+.suggest-follow-btn { 
+    flex-shrink: 0; border: none; background: none; padding: 4px 2px; 
+    font-size: 12px; font-weight: 700; color: var(--helios-navy-bright); cursor: pointer; 
+}
+.suggest-follow-btn:hover { color: var(--helios-mint); }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1024px) {
+  .search-wrap { max-width: 200px; }
+  .nav-link-item { min-width: 55px; font-size: 10px; }
+  .nav-link-item i { font-size: 18px; }
+  .cv-img { height: 350px; }
+  .h-card, .cv-card { margin: 0 15px 20px; }
+}
+
+@media (max-width: 768px) {
+  /* Topbar */
+  .topbar { height: 52px; min-height: 52px; padding: 0; }
+  .logo-img { height: 28px; max-width: 120px; margin-right: 4px; }
+
+  /* Nav */
+  .search-wrap { display: none !important; }
+  .nav-main { flex-wrap: nowrap; justify-content: space-around; gap: 0; }
+  .nav-menu-item { flex: 1 1 0; min-width: 0; }
+  .nav-link-item { min-width: 0; width: 100%; padding: 0; flex-shrink: 1; }
+  .nav-link-item i { font-size: 22px; }
+  .nav-link-item span { display: none !important; }
+  .nav-badge { right: 4px !important; font-size: 9px; padding: 1px 3px; }
+  .user-profile-nav { flex: 1 1 0; min-width: 0; padding-left: 0 !important; margin-left: 0 !important; }
+
+  /* CV */
+  .cv-hero { padding: 20px 15px; }
+  .cv-tip-box, .cv-side-box, .cv-card { margin-bottom: 15px; }
+  .cv-img { height: 250px; }
+  .h-card, .cv-card { margin: 0 10px 15px; }
+}

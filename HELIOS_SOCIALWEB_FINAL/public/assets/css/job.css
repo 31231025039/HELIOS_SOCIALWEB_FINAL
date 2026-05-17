@@ -1,0 +1,100 @@
+/* =========================================
+   STYLE DÀNH RIÊNG CHO TRANG VIỆC LÀM (JOB)
+========================================= */
+
+/* ===== HERO ===== */
+.hero {
+  /* Giả sử bạn có file heroBanner.png trong thư mục images */
+  background: linear-gradient(135deg, var(--helios-navy) 0%, var(--helios-navy-soft) 100%);
+  padding: 52px 0 44px;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  width: 420px;
+  height: 420px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.04);
+  top: -120px;
+  right: -80px;
+  pointer-events: none;
+}
+
+.hero h1 {
+  color: #fff;
+  font-size: clamp(22px, 4vw, 34px);
+  font-weight: 700;
+  line-height: 1.25;
+  margin-bottom: 6px;
+}
+.hero h1 span { color: #5effc1; }
+.hero p { color: rgba(255,255,255,0.72); font-size: 15px; margin-bottom: 28px; }
+
+/* Search Bar */
+.search-bar {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 6px 30px rgba(0,0,0,0.15);
+  padding: 10px 12px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.search-bar .search-input {
+  flex: 1; min-width: 200px; border: none; outline: none; font-size: 14px;
+  padding: 8px 12px; background: transparent;
+}
+.search-divider { width: 1.5px; height: 28px; background: var(--helios-border); flex-shrink: 0; }
+.btn-search {
+  background: var(--helios-mint); color: #fff; border: none; border-radius: 9px;
+  padding: 10px 28px; font-weight: 700; font-size: 15px; cursor: pointer; white-space: nowrap;
+}
+
+/* Hero Stats */
+.hero-stats { display: flex; gap: 28px; margin-top: 22px; flex-wrap: wrap; }
+.hero-stat { color: rgba(255,255,255,0.85); font-size: 13px; }
+.hero-stat strong { color: #fff; font-size: 17px; font-weight: 700; display: block; }
+
+/* ===== JOB CARD ===== */
+.section-title { font-size: 20px; font-weight: 700; color: var(--helios-navy); margin-bottom: 0; }
+
+.job-card {
+  background: #fff; border: 1.5px solid var(--helios-border); border-radius: 8px;
+  padding: 14px 16px; transition: box-shadow 0.2s, transform 0.15s;
+  cursor: pointer; height: 100%; display: flex; flex-direction: column; gap: 8px;
+}
+.job-card:hover { box-shadow: var(--helios-shadow); border-color: var(--helios-navy); transform: translateY(-2px); }
+
+.badge-hot {
+  background: #dc3545; color: #fff; font-size: 10px; font-weight: 700;
+  padding: 2px 7px; border-radius: 4px; flex-shrink: 0;
+}
+
+.job-logo {
+  width: 46px; height: 46px; border-radius: 8px; border: 1.5px solid var(--helios-border);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden;
+}
+.job-logo img { width: 100%; height: 100%; object-fit: contain; }
+
+.job-title { font-size: 14px; font-weight: 600; line-height: 1.4; }
+.job-company { font-size: 12.5px; color: var(--helios-navy); font-weight: 500; }
+.job-salary { font-size: 13px; font-weight: 600; color: var(--helios-mint); }
+.job-location { font-size: 12px; color: var(--helios-text-muted); }
+
+/* ===== SUPPORT SECTION ===== */
+.support-section { background: #f0f5f9; border-top: 1.5px solid var(--helios-border); padding: 44px 0 36px; text-align: center; }
+.support-section h4 { font-size: 20px; font-weight: 700; color: var(--helios-navy); margin-bottom: 8px; }
+.contact-pill {
+  display: inline-flex; align-items: center; gap: 14px; background: #fff;
+  border: 1.5px solid var(--helios-border); border-radius: 50px; padding: 12px 28px;
+  font-weight: 600; text-decoration: none; color: inherit;
+}
+.contact-pill .icon-wrap {
+  width: 38px; height: 38px; background: var(--helios-mint); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; color: #fff;
+}
+.contact-pill .icon-wrap.mail { background: var(--helios-navy); }
