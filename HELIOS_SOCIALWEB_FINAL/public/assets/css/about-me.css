@@ -4,6 +4,7 @@
 .extra-small { font-size: 11px; }
 
 .profile-cover {
+   position: relative;
   height: 180px;
   background: var(--helios-mint-soft);
   overflow: hidden;
