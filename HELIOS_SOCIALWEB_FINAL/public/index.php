@@ -1,21 +1,41 @@
 <?php
 // 1. CẤU HÌNH CƠ BẢN
 define('ROOT_PATH', dirname(__DIR__));
-define('VIEW_PATH', ROOT_PATH . '/app/views');
 define('APP_PATH', ROOT_PATH . '/app');
+define('ADMIN_PATH', ROOT_PATH . '/admin');
+define('JOBS_PER_PAGE', 4);
+
+// Đường dẫn tới thư mục Views (chung cho cả app và admin)
+define('VIEW_PATH_APP', APP_PATH . '/views');
+define('VIEW_PATH_ADMIN', ADMIN_PATH . '/views');
+
 $baseUrl = '/helios/public/';
+
+// AUTOLOADER NÂNG CẤP
 spl_autoload_register(function ($class) {
-    $controllerPath = ROOT_PATH . '/app/controllers/' . $class . '.php';
-    $modelPath      = ROOT_PATH . '/app/models/' . $class . '.php';
-    if (file_exists($controllerPath)) require_once $controllerPath;
-    elseif (file_exists($modelPath))  require_once $modelPath;
+    $paths = [
+        ROOT_PATH . '/config/' . $class . '.php',      // Thư mục config
+        APP_PATH . '/controllers/' . $class . '.php', // Controller của App
+        APP_PATH . '/models/' . $class . '.php',      // Model của App
+        ADMIN_PATH . '/controllers/' . $class . '.php', // Controller của Admin
+        ADMIN_PATH . '/models/' . $class . '.php',      // Model của Admin
+    ];
+
+    foreach ($paths as $path) {
+        if (file_exists($path)) {
+            require_once $path;
+            return;
+        }
+    }
 });
+
 // 2. XỬ LÝ URL
 $request_uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 if (strpos($request_uri, $baseUrl) === 0) {
     $request_uri = substr($request_uri, strlen($baseUrl));
 }
 $request_uri = trim($request_uri, '/');
+
 // ==========================================================
 // 3. DANH SÁCH ĐƯỜNG DẪN (ROUTING TỔNG HỢP BẰNG MẢNG)
 // ==========================================================
@@ -54,6 +74,7 @@ $routes = [
     'about-me/edit-education'  => ['AboutMeController', 'editEducation'],
     'about-me/add-skill'       => ['AboutMeController', 'addSkill'],
     'about-me/delete-skill'    => ['AboutMeController', 'deleteSkill'],
+    'about-me/update-image'    => ['AboutMeController', 'updateImage'],
     /*
     |--------------------------------------------------------------------------
     | NETWORK
@@ -74,13 +95,55 @@ $routes = [
     'job/detail'               => ['JobController', 'detail'],
     /*
     |--------------------------------------------------------------------------
+    | MESSAGE
+    |--------------------------------------------------------------------------
+    */    
+    // Message routes
+    'message'                    => ['MessageController', 'index'],
+    'message/send'               => ['MessageController', 'send'],
+    'message/upload'             => ['MessageController', 'upload'],
+    'message/poll'               => ['MessageController', 'poll'],
+    'message/delete'             => ['MessageController', 'delete'],
+    'message/delete-conversation'=> ['MessageController', 'deleteConversation'],
+    'message/pin'                => ['MessageController', 'pin'],
+    'message/search'             => ['MessageController', 'search'],
+    'message/search-messages'    => ['MessageController', 'searchMessages'],
+    'message/pinned-list'        => ['MessageController', 'getPinnedList'],
+    /*
+    |--------------------------------------------------------------------------
     | NOTI
     |--------------------------------------------------------------------------
     */
     'noti'                     => ['NotiController', 'index'],
     'noti/mark-read'           => ['NotiController', 'markRead'],
     'noti/mark-all-read'       => ['NotiController', 'markAllRead'],
-    'noti/delete'              => ['NotiController', 'deleteNoti']
+    'noti/delete'              => ['NotiController', 'deleteNoti'],
+    
+    /*
+    |--------------------------------------------------------------------------
+    | ADMIN
+    |--------------------------------------------------------------------------
+    */
+    'admin' => ['AdminDashboardController', 'index'],
+    'admin/dashboard' => ['AdminDashboardController', 'index'],
+
+    'admin/jobs' => ['AdminJobController', 'index'],
+    'admin/jobs/create' => ['AdminJobController', 'create'],
+    'admin/jobs/update' => ['AdminJobController', 'update'],
+    'admin/jobs/delete' => ['AdminJobController', 'delete'],
+    'admin/jobs/get-skills' => ['AdminJobController', 'getSkills'],
+    'admin/companies' => ['AdminCompanyController', 'index'],
+    'admin/companies/create' => ['AdminCompanyController', 'create'],
+    'admin/companies/update' => ['AdminCompanyController', 'update'],
+    'admin/companies/delete' => ['AdminCompanyController', 'delete'],
+
+    'admin/posts'                  => ['AdminPostController', 'index'],
+    'admin/posts/detail'           => ['AdminPostController', 'detail'],
+    'admin/posts/get-posts'        => ['AdminPostController', 'getPosts'],
+    'admin/posts/get-detail'       => ['AdminPostController', 'getDetail'],
+    'admin/posts/create'           => ['AdminPostController', 'create'],
+    'admin/posts/delete'           => ['AdminPostController', 'delete'],
+    'admin/posts/update'           => ['AdminPostController', 'update'],
 ];
 // ==========================================================
 // 4. BỘ ĐIỀU HƯỚNG (DISPATCHER)
@@ -96,8 +159,16 @@ if (array_key_exists($request_uri, $routes)) {
 } else {
     // NẾU TÌM KHÔNG THẤY TRONG MẢNG -> BÁO LỖI 404
     http_response_code(404);
-    $pageTitle   = "404 Not Found";
-    $contentView = VIEW_PATH . '/404.php';
-    include VIEW_PATH . '/layouts/main.php';
+    $pageTitle = "404 Not Found";
+
+    // Kiểm tra xem URL có bắt đầu bằng 'admin/' không
+    if (strpos($request_uri, 'admin/') === 0) {
+        // Nếu là trang admin, nạp file 404.php và layout của admin
+        $contentView = VIEW_PATH_ADMIN . '/404.php';
+        include VIEW_PATH_ADMIN . '/layouts/main.php';
+    } else {
+        // Nếu là trang người dùng, nạp file 404.php và layout của app
+        $contentView = VIEW_PATH_APP . '/404.php';
+        include VIEW_PATH_APP . '/layouts/main.php';
+    }
 }
-?>
