@@ -3,138 +3,140 @@
 
 class AboutMeController {
     
-    // 1. Hàm hiển thị trang web
+    // 1. Hàm hiển thị trang web (Đã sửa để dùng VIEW_PATH_APP)
     public function index() {
-            $pageTitle = "Tôi | Helios";
-            $activeNav = 'profile';
-            $cssFiles = ['about-me.css']; 
-            
-            $userModel = new UserModel();
-            // Lấy thông tin user
-            $userData = $userModel->getUser(1); 
-            // LẤY DANH SÁCH KINH NGHIỆM ĐỂ TRUYỀN RA VIEW
-            $kinhNghiemList = $userModel->getKinhNghiemList(1); 
-            $hocVanList = $userModel->getHocVanList(1);
-            $userSkills = $userModel->getUserSkills(1);
-            $availableSkills = $userModel->getAvailableSkills(1);
+        $pageTitle = "Tôi | Helios";
+        $activeNav = 'profile';
+        $cssFiles = ['about-me.css']; 
+        $jsFiles = ['about-me.js'];
+        
+        $userModel = new UserModel();
+        $userData = $userModel->getUser(1); 
+        $kinhNghiemList = $userModel->getKinhNghiemList(1); 
+        $hocVanList = $userModel->getHocVanList(1);
+        $userSkills = $userModel->getUserSkills(1);
+        $availableSkills = $userModel->getAvailableSkills(1);
 
-            $contentView = VIEW_PATH . '/about-me.php';
-            include VIEW_PATH . '/layouts/main.php';
+        $contentView = VIEW_PATH_APP . '/about-me.php';
+        include VIEW_PATH_APP . '/layouts/main.php';
     }
 
-    // 2. Hàm xử lý khi Form chỉnh sửa được submit
-    public function update() {
-        // Kiểm tra xem phương thức gửi lên có phải là POST không
-        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            
-            // Nhận dữ liệu từ các thẻ <input name="..."> trong Form
-            $hoTen = $_POST['hoten'];
-            $tieuDe = $_POST['tieude'];
-            $diaDiem = $_POST['diadiem'];
-            
-            // Gọi Model để lưu vào Database (Update cho user ID = 1)
-            $userModel = new UserModel();
-            $userModel->updateUser(1, $hoTen, $tieuDe, $diaDiem);
+    /**
+     * Hàm helper để trả về JSON response và dừng script.
+     */
+    private function jsonResponse($success, $message = '', $data = []) {
+        header('Content-Type: application/json');
+        echo json_encode(['success' => $success, 'message' => $message] + $data);
+        exit();
+    }
 
-            // Lưu thành công -> Chuyển hướng người dùng quay lại trang about-me
-            header("Location: /helios/public/about-me");
-            exit();
+    // 2. Cập nhật thông tin cá nhân (đã chuyển sang JSON)
+    public function update() {
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $userModel = new UserModel();
+            $success = $userModel->updateUser(1, $_POST['hoten'], $_POST['tieude'], $_POST['diadiem']);
+            $this->jsonResponse($success, $success ? '' : 'Lỗi cập nhật CSDL.');
         }
     }
-    // Hàm xử lý khi Form Giới thiệu được submit
+
+    // 3. Cập nhật Bio (Giới thiệu)
     public function updateBio() {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            
-            $bio = $_POST['bio']; // Lấy nội dung từ ô textarea có name="bio"
-            
-            // Gọi Model để lưu vào Database (User ID = 1)
+            $bio = $_POST['bio'] ?? '';
             $userModel = new UserModel();
-            $userModel->updateBio(1, $bio);
-
-            // Chuyển hướng về lại trang
-            header("Location: /helios/public/about-me");
-            exit();
+            $success = $userModel->updateBio(1, $bio);
+            $this->jsonResponse($success, '', ['newBioHtml' => nl2br(htmlspecialchars($bio))]);
         }
     }
 
+    // 4. Thêm kinh nghiệm (đã sửa lỗi thiếu tham số)
     public function addExperience() {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            $congTy = $_POST['congty'];
-            $viTri = $_POST['vitri'];
-            $tuNgay = $_POST['tungay'];
-            // Nếu người dùng không nhập ngày kết thúc, gán là NULL
-            $denNgay = !empty($_POST['denngay']) ? $_POST['denngay'] : NULL; 
-            $moTa = $_POST['mota'];
-
+            $denNgay = !empty($_POST['denngay']) ? $_POST['denngay'] : NULL;
             $userModel = new UserModel();
-            $userModel->addKinhNghiem(1, $congTy, $viTri, $moTa, $tuNgay, $denNgay);
-
-            header("Location: /helios/public/about-me"); exit();
+            $success = $userModel->addKinhNghiem(1, $_POST['congty'], $_POST['vitri'], $_POST['mota'], $_POST['tungay'], $denNgay);
+            $this->jsonResponse($success);
         }
     }
 
-    // HÀM XỬ LÝ SỬA KINH NGHIỆM
+    // 5. Sửa kinh nghiệm
     public function editExperience() {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            $maKN = $_POST['makinhnghiem']; // Bắt buộc phải có ID của dòng cần sửa
-            $congTy = $_POST['congty'];
-            $viTri = $_POST['vitri'];
-            $tuNgay = $_POST['tungay'];
             $denNgay = !empty($_POST['denngay']) ? $_POST['denngay'] : NULL;
-            $moTa = $_POST['mota'];
-
             $userModel = new UserModel();
-            $userModel->updateKinhNghiem($maKN, 1, $congTy, $viTri, $moTa, $tuNgay, $denNgay);
-
-            header("Location: /helios/public/about-me"); exit();
+            $success = $userModel->updateKinhNghiem($_POST['makinhnghiem'], 1, $_POST['congty'], $_POST['vitri'], $_POST['mota'], $_POST['tungay'], $denNgay);
+            $this->jsonResponse($success);
         }
     }
-     public function addEducation() {
+
+    // 6. Thêm học vấn (đã chuyển sang JSON)
+    public function addEducation() {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            $truongHoc = $_POST['truonghoc'];
-            $chuyenNganh = $_POST['chuyennganh'];
-            $tuNgay = $_POST['tungay'];
             $denNgay = !empty($_POST['denngay']) ? $_POST['denngay'] : NULL;
-
             $userModel = new UserModel();
-            $userModel->addHocVan(1, $truongHoc, $chuyenNganh, $tuNgay, $denNgay);
-
-            header("Location: /helios/public/about-me"); exit();
+            $success = $userModel->addHocVan(1, $_POST['truonghoc'], $_POST['chuyennganh'], $_POST['tungay'], $denNgay);
+            $this->jsonResponse($success);
         }
     }
 
-    // HÀM XỬ LÝ SỬA HỌC VẤN
+    // 7. Sửa học vấn (đã chuyển sang JSON)
     public function editEducation() {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            $maHV = $_POST['mahocvan']; 
-            $truongHoc = $_POST['truonghoc'];
-            $chuyenNganh = $_POST['chuyennganh'];
-            $tuNgay = $_POST['tungay'];
             $denNgay = !empty($_POST['denngay']) ? $_POST['denngay'] : NULL;
-
             $userModel = new UserModel();
-            $userModel->updateHocVan($maHV, 1, $truongHoc, $chuyenNganh, $tuNgay, $denNgay);
-
-            header("Location: /helios/public/about-me"); exit();
+            $success = $userModel->updateHocVan($_POST['mahocvan'], 1, $_POST['truonghoc'], $_POST['chuyennganh'], $_POST['tungay'], $denNgay);
+            $this->jsonResponse($success);
         }
     }
+
+    // 8. Thêm kỹ năng (đã chuyển sang JSON)
     public function addSkill() {
         if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['makynang'])) {
-            $maKyNang = $_POST['makynang'];
             $userModel = new UserModel();
-            $userModel->addUserSkill(1, $maKyNang);
+            $success = $userModel->addUserSkill(1, $_POST['makynang']);
+            $this->jsonResponse($success);
         }
-        header("Location: /helios/public/about-me"); exit();
+        $this->jsonResponse(false, 'Chưa chọn kỹ năng.');
     }
 
-    // HÀM XỬ LÝ XÓA KỸ NĂNG
+    // 9. Xóa kỹ năng (đã chuyển sang JSON)
     public function deleteSkill() {
         if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['makynang'])) {
-            $maKyNang = $_POST['makynang'];
             $userModel = new UserModel();
-            $userModel->removeUserSkill(1, $maKyNang);
+            $success = $userModel->removeUserSkill(1, $_POST['makynang']);
+            $this->jsonResponse($success);
         }
-        header("Location: /helios/public/about-me"); exit();
+        $this->jsonResponse(false, 'Không tìm thấy kỹ năng để xóa.');
+    }
+
+    // 10. Cập nhật ảnh đại diện/ảnh bìa (giữ nguyên)
+    public function updateImage() {
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            // ... (code upload ảnh của bạn đã tốt, giữ nguyên) ...
+            // Chỉ cần đảm bảo nó cũng dùng $this->jsonResponse() ở cuối
+            $imageType = $_POST['image_type'] ?? '';
+            if (!in_array($imageType, ['avatar', 'cover'])) {
+                $this->jsonResponse(false, 'Loại ảnh không hợp lệ.');
+            }
+            if (isset($_FILES['image_file']) && $_FILES['image_file']['error'] == 0) {
+                $userModel = new UserModel();
+                $result = $userModel->uploadFile($_FILES['image_file']); 
+                if ($result['success']) {
+                    $filePath = $result['filePath'];
+                    $updateSuccess = $userModel->updateUserImage(1, $imageType, $filePath);
+                    if ($updateSuccess) {
+                        $this->jsonResponse(true, '', ['filePath' => $filePath]);
+                    } else {
+                        @unlink(ROOT_PATH . '/public' . $filePath);
+                        $this->jsonResponse(false, 'Lỗi cập nhật cơ sở dữ liệu.');
+                    }
+                } else {
+                    $this->jsonResponse(false, $result['message']);
+                }
+            } else {
+                $this->jsonResponse(false, 'Không có file nào được tải lên hoặc có lỗi xảy ra.');
+            }
+        }
     }
 }
 ?>
