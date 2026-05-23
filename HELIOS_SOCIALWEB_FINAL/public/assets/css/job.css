@@ -2,25 +2,53 @@
    STYLE DÀNH RIÊNG CHO TRANG VIỆC LÀM (JOB)
 ========================================= */
 
-/* ===== HERO ===== */
+/* ===== HERO (nền heroBanner.png) ===== */
 .hero {
-  /* Giả sử bạn có file heroBanner.png trong thư mục images */
-  background: linear-gradient(135deg, var(--helios-navy) 0%, var(--helios-navy-soft) 100%);
+  --hero-banner: url('../images/heroBanner.png');
+  background-color: var(--helios-navy);
+  background-image:
+    linear-gradient(
+      90deg,
+      rgba(6, 43, 107, 0.97) 0%,
+      rgba(6, 43, 107, 0.88) 38%,
+      rgba(6, 43, 107, 0.45) 62%,
+      rgba(6, 43, 107, 0.15) 100%
+    ),
+    var(--hero-banner);
+  background-repeat: no-repeat;
+  background-position: center, right center;
+  background-size: cover, cover;
   padding: 52px 0 44px;
   position: relative;
   overflow: hidden;
+  min-height: clamp(320px, 42vw, 420px);
 }
 
-.hero::before {
-  content: '';
-  position: absolute;
-  width: 420px;
-  height: 420px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.04);
-  top: -120px;
-  right: -80px;
-  pointer-events: none;
+.hero-inner {
+  position: relative;
+  z-index: 1;
+}
+
+.hero-content-col {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+@media (max-width: 991.98px) {
+  .hero {
+    background-image:
+      linear-gradient(
+        180deg,
+        rgba(6, 43, 107, 0.94) 0%,
+        rgba(6, 43, 107, 0.82) 55%,
+        rgba(6, 43, 107, 0.55) 100%
+      ),
+      var(--hero-banner);
+    background-position: center, center bottom;
+    background-size: cover, cover;
+    min-height: auto;
+  }
 }
 
 .hero h1 {
@@ -43,6 +71,8 @@
   gap: 8px;
   align-items: center;
   flex-wrap: wrap;
+  width: 100%;
+  margin: 0;
 }
 .search-bar .search-input {
   flex: 1; min-width: 200px; border: none; outline: none; font-size: 14px;
@@ -98,3 +128,39 @@
   display: flex; align-items: center; justify-content: center; color: #fff;
 }
 .contact-pill .icon-wrap.mail { background: var(--helios-navy); }
+
+/* ===== PAGINATION ===== */
+.job-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.job-pagination .page-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 38px;
+  height: 38px;
+  padding: 0 12px;
+  border: 1.5px solid var(--helios-border);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--helios-navy);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.job-pagination .page-link:hover {
+  border-color: var(--helios-navy);
+  background: var(--helios-mint-soft);
+}
+.job-pagination .page-link.active {
+  background: var(--helios-navy);
+  border-color: var(--helios-navy);
+  color: #fff;
+  pointer-events: none;
+}
+.job-pagination .page-nav { min-width: auto; }
