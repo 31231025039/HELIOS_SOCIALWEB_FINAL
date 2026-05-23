@@ -142,5 +142,53 @@ class UserModel extends Database {
         $stmt->bindParam(':kid', $maKyNang);
         return $stmt->execute();
     }
+
+    public function updateUserImage($userId, $imageType, $filePath) {
+        $column = ($imageType === 'avatar') ? 'AnhDaiDien' : 'AnhBia';
+        
+        // Không thể bind tên cột, nên phải kiểm tra whitelist như thế này để an toàn
+        if (!in_array($column, ['AnhDaiDien', 'AnhBia'])) {
+            return false;
+        }
+
+        $sql = "UPDATE NguoiDung SET $column = :filepath WHERE MaNguoiDung = :id";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindParam(':filepath', $filePath);
+        $stmt->bindParam(':id', $userId);
+        return $stmt->execute();
+    }
+
+    // HÀM MỚI: Xử lý upload file
+    public function uploadFile($file) {
+        $targetDir = ROOT_PATH . "/public/uploads/profiles/";
+        if (!file_exists($targetDir)) {
+            mkdir($targetDir, 0777, true); // Tạo thư mục nếu chưa có
+        }
+
+        // Kiểm tra file
+        $maxSize = 5 * 1024 * 1024; // 5MB
+        $allowedTypes = ['jpg', 'jpeg', 'png', 'gif'];
+        $fileName = basename($file["name"]);
+        $fileType = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+
+        if ($file["size"] > $maxSize) {
+            return ['success' => false, 'message' => 'File quá lớn. Vui lòng chọn file nhỏ hơn 5MB.'];
+        }
+        if (!in_array($fileType, $allowedTypes)) {
+            return ['success' => false, 'message' => 'Chỉ chấp nhận file ảnh JPG, JPEG, PNG, GIF.'];
+        }
+
+        // Tạo tên file mới, duy nhất để tránh bị ghi đè
+        $newFileName = uniqid() . '_' . time() . '.' . $fileType;
+        $targetFile = $targetDir . $newFileName;
+
+        if (move_uploaded_file($file["tmp_name"], $targetFile)) {
+            // Trả về đường dẫn tương đối để lưu vào CSDL
+            $relativePath = '/uploads/profiles/' . $newFileName;
+            return ['success' => true, 'filePath' => $relativePath];
+        } else {
+            return ['success' => false, 'message' => 'Đã có lỗi xảy ra khi tải file lên.'];
+        }
+    }
 } 
 ?>
