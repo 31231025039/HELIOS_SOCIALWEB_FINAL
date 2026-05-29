@@ -391,14 +391,18 @@
                     </div>
                     <hr>
                     <p class="fw-bold small mb-2">Thêm kỹ năng mới:</p>
-                    <form id="addSkillForm" action="<?= $baseUrl ?>about-me/add-skill" method="POST" class="d-flex gap-2">
-                        <select class="form-select form-select-sm" name="makynang" required>
-                            <option value="" selected disabled>-- Chọn kỹ năng --</option>
-                            <?php foreach ($availableSkills as $newSkill): ?>
-                                <option value="<?= $newSkill['MaKyNang'] ?>"><?= htmlspecialchars($newSkill['TenKyNang']) ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                        <button type="submit" class="btn btn-primary btn-sm fw-bold px-3">Thêm</button>
+                    <form id="addSkillForm" action="<?= $baseUrl ?>about-me/add-skill" method="POST">
+                        <!-- CHÚ Ý: name đã đổi thành mảng makynang[], có chữ multiple và thêm ID để JS gọi -->
+                        <div class="mb-3">
+                            <select id="multiSkillSelect" name="makynang[]" multiple placeholder="Gõ để tìm kiếm và chọn kỹ năng..." required>
+                                <?php foreach ($availableSkills as $newSkill): ?>
+                                    <option value="<?= $newSkill['MaKyNang'] ?>"><?= htmlspecialchars($newSkill['TenKyNang']) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" class="btn btn-primary btn-sm fw-bold px-4">Thêm các kỹ năng này</button>
+                        </div>
                     </form>
                 </div>
             </div>
@@ -454,4 +458,3 @@
     </div>
 
 <?php endif; ?>
-<!-- KẾT THÚC KHU VỰC MODAL -->
