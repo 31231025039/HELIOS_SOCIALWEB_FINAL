@@ -1,6 +1,3 @@
-/* Page-specific styles for Homepage.html - chỉ các phần riêng cho feed */
-
-/* Profile Sidebar (chỉ các phần chưa có trong style.css) */
 .profile-banner {
   height: 60px;
   background: var(--helios-mint);
@@ -108,6 +105,12 @@
   border-radius: 4px;
 }
 .post-action-btn:hover { background: #dcf7f2; color: #0f5fa8; }
+.post-action-btn.is-reacted {
+  color: var(--helios-navy);
+}
+.post-action-btn.is-reacted i {
+  color: inherit;
+}
 
 .post-action-like-wrap {
   position: relative;
@@ -178,6 +181,17 @@
   line-height: 1;
   filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.12));
 }
+.reaction-like i { color: #0d6efd; }
+.reaction-care i { color: #dc3545; }
+.reaction-useful i { color: #ffc107; }
+.reaction-congrats i { color: #198754; }
+
+.reaction-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+}
 
 /* Event card */
 .event-card {
@@ -210,6 +224,51 @@
 }
 .comment-section textarea {
   resize: none;
+}
+.comment-bubble {
+  background: #f0f2f5;
+  border-radius: 12px;
+  padding: 8px 10px;
+}
+.comment-hidden {
+  color: #6c757d;
+  font-style: italic;
+}
+.comment-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 0 0 10px;
+  font-size: 11px;
+}
+.comment-actions .btn-link {
+  color: #65676b;
+  font-size: 11px;
+  font-weight: 700;
+  text-decoration: none;
+}
+.comment-actions .btn-link:hover {
+  text-decoration: underline;
+}
+.comment-reply {
+  margin-left: 22px;
+  position: relative;
+}
+.comment-reply::before {
+  content: "";
+  position: absolute;
+  left: -14px;
+  top: -4px;
+  width: 12px;
+  height: 24px;
+  border-left: 2px solid #d8dee8;
+  border-bottom: 2px solid #d8dee8;
+  border-bottom-left-radius: 8px;
+}
+.replying-to {
+  background: #eef5ff;
+  border-radius: 8px;
+  padding: 6px 8px;
 }
 .comment-avatar-small {
   width: 32px;
