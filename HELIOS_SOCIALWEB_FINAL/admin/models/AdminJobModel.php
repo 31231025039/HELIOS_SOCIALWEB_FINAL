@@ -18,7 +18,6 @@ class AdminJobModel extends Database {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-        // Sửa hàm addJob()
     public function addJob($data) {
         $sql = "INSERT INTO CongViec (TieuDe, MoTa, YeuCau, QuyenLoi, NoiLamViec, MucLuong, HanNop, MaCongTy) 
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
@@ -29,7 +28,6 @@ class AdminJobModel extends Database {
         ]);
     }
 
-    // Sửa hàm updateJob()
     public function updateJob($id, $data) {
         $sql = "UPDATE CongViec SET TieuDe = ?, MoTa = ?, YeuCau = ?, QuyenLoi = ?, NoiLamViec = ?, 
                 MucLuong = ?, HanNop = ?, MaCongTy = ? WHERE MaCongViec = ?";
@@ -69,7 +67,6 @@ class AdminJobModel extends Database {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    // HÀM MỚI: Lấy các ID kỹ năng của một công việc cụ thể
     public function getJobSkillIds($jobId) {
         $stmt = $this->db->prepare("SELECT MaKyNang FROM CongViec_KyNang WHERE MaCongViec = ?");
         $stmt->execute([$jobId]);
