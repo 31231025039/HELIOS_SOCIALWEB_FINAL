@@ -23,12 +23,13 @@
 
 <div class="card">
     <div class="card-body">
+        <div class="table-responsive">
         <table class="table table-hover">
             <thead>
                 <tr>
                     <th>Logo</th>
                     <th>Tên công ty</th>
-                    <th>Mô tả</th>
+                    <th class="col-content-medium">Mô tả</th>
                     <th>Hành động</th>
                 </tr>
             </thead>
@@ -46,7 +47,7 @@
                                      style="width: 50px; height: 50px; object-fit: contain;">
                             </td>
                             <td class="align-middle"><?php echo htmlspecialchars($company['TenCongTy']); ?></td>
-                            <td class="align-middle"><?php echo htmlspecialchars(mb_substr($company['MoTa'], 0, 80)) . '...'; ?></td>
+                            <td class="align-middle col-content-medium"><?php echo htmlspecialchars(mb_substr($company['MoTa'], 0, 80)) . '...'; ?></td>
                             <td class="align-middle">
                                 <button class="btn btn-sm btn-warning btn-edit-company" data-company='<?php echo json_encode($company, JSON_HEX_QUOT | JSON_HEX_TAG); ?>'>
                                     <i class="bi bi-pencil-square"></i>
@@ -60,6 +61,7 @@
                 <?php endif; ?>
             </tbody>
         </table>
+        </div>
     </div>
 </div>
 
