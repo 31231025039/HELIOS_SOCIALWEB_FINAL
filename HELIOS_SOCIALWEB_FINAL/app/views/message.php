@@ -7,10 +7,10 @@ $msgs = $messages ?? [];
 $pinnedMessages = $pinnedMessages ?? [];
 $images = $images ?? [];
 ?>
-<div class="msg-shell container-xl px-2 py-3">
-    <div class="msg-layout h-card" id="msgLayout">
-        <?php include VIEW_PATH_APP . '/message_conversation.php'; ?>
-        <?php include VIEW_PATH_APP . '/message_chat.php'; ?>
+<div class="container-xl px-2 py-3">
+    <div class="msg-layout" id="msgLayout">
+        <?php include VIEW_PATH_APP . '/message-conversation.php'; ?>
+        <?php include VIEW_PATH_APP . '/message-chat.php'; ?>
     </div>
 </div>
 
