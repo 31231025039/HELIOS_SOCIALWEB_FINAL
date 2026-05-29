@@ -9,14 +9,12 @@ class AdminCompanyController {
         $this->companyModel = new AdminCompanyModel();
     }
 
-    // Hàm helper để trả về JSON
     private function jsonResponse($success, $message = '') {
         header('Content-Type: application/json');
         echo json_encode(['success' => $success, 'message' => $message]);
         exit();
     }
 
-    // Hàm index() giữ nguyên, chỉ cần đảm bảo có $jsFiles
     public function index() {
         $searchTerm = $_GET['search'] ?? '';
         $companies = !empty($searchTerm) 
@@ -25,7 +23,7 @@ class AdminCompanyController {
 
         $pageTitle = "Quản lý công ty";
         $activeMenu = "companies";
-        $jsFiles = ['admin-companies.js']; // Đảm bảo file JS được nạp
+        $jsFiles = ['admin-companies.js']; 
         $contentView = VIEW_PATH_ADMIN . '/companies.php';
         
         include VIEW_PATH_ADMIN . '/layouts/main.php';
