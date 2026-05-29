@@ -1,4 +1,5 @@
 ﻿<?php
+// noti-list.php - Danh sách thông báo dùng chung cho load trang và AJAX.
 if (!isset($notifications)) $notifications = [];
 ?>
 <div class="list-group list-group-flush">
