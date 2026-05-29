@@ -2,7 +2,7 @@
 // app/models/MessageModel.php
 class MessageModel extends Database {
 
-    /** Lấy danh sách hội thoại của user */
+    /* Lấy danh sách hội thoại của user */
     public function getConversations(int $userId): array {
         $sql = "
             SELECT 
@@ -36,7 +36,7 @@ class MessageModel extends Database {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    /** Lấy thông tin người dùng theo ID */
+    /* Lấy thông tin người dùng theo ID */
     public function getUserInfo(int $userId): ?array {
         $stmt = $this->db->prepare("
             SELECT MaNguoiDung AS id, HoTen AS name, AnhDaiDien AS avatar, TieuDe AS headline
@@ -46,7 +46,7 @@ class MessageModel extends Database {
         return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
     }
 
-    /** Lấy tất cả tin nhắn giữa 2 người */
+    /* Lấy tất cả tin nhắn giữa 2 người */
     public function getMessages(int $userId, int $otherId): array {
         $sql = "
             SELECT 
@@ -71,7 +71,7 @@ class MessageModel extends Database {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    /** Lấy tin nhắn mới (polling) */
+    /* Lấy tin nhắn mới (polling) */
     public function getNewMessages(int $userId, int $otherId, int $lastId): array {
         $sql = "
             SELECT 
@@ -96,49 +96,49 @@ class MessageModel extends Database {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    /** Gửi tin nhắn văn bản */
+    /* Gửi tin nhắn văn bản */
     public function sendMessage(int $userId, int $otherId, string $content): int|false {
         $sql = "INSERT INTO TinNhan (NguoiGui, NguoiNhan, NoiDung, ThoiGianGui, TrangThaiDoc) VALUES (?, ?, ?, NOW(), 0)";
         $stmt = $this->db->prepare($sql);
         return $stmt->execute([$userId, $otherId, $content]) ? (int)$this->db->lastInsertId() : false;
     }
 
-    /** Gửi tin nhắn kèm file */
+    /* Gửi tin nhắn kèm file */
     public function sendMessageWithFile(int $userId, int $otherId, string $content, ?string $filePath = null): int|false {
         $sql = "INSERT INTO TinNhan (NguoiGui, NguoiNhan, NoiDung, DuongDanFile, ThoiGianGui, TrangThaiDoc) VALUES (?, ?, ?, ?, NOW(), 0)";
         $stmt = $this->db->prepare($sql);
         return $stmt->execute([$userId, $otherId, $content, $filePath]) ? (int)$this->db->lastInsertId() : false;
     }
 
-    /** Đánh dấu tin nhắn đã đọc */
+    /* Đánh dấu tin nhắn đã đọc */
     public function markAsRead(int $userId, int $otherId): void {
         $sql = "UPDATE TinNhan SET TrangThaiDoc = 1 WHERE NguoiNhan = ? AND NguoiGui = ? AND (TrangThaiDoc = 0 OR TrangThaiDoc IS NULL)";
         $stmt = $this->db->prepare($sql);
         $stmt->execute([$userId, $otherId]);
     }
 
-    /** Xóa tin nhắn (chỉ xóa được tin của mình) */
+    /* Xóa tin nhắn (chỉ xóa được tin của mình) */
     public function deleteMessage(int $msgId, int $userId): bool {
         $stmt = $this->db->prepare("DELETE FROM TinNhan WHERE MaTinNhan = ? AND NguoiGui = ?");
         $stmt->execute([$msgId, $userId]);
         return $stmt->rowCount() > 0;
     }
 
-    /** Xóa toàn bộ hội thoại (xóa tất cả tin nhắn giữa 2 người) */
+    /* Xóa toàn bộ hội thoại (xóa tất cả tin nhắn giữa 2 người) */
     public function deleteConversation(int $userId, int $otherId): bool {
         $sql = "DELETE FROM TinNhan WHERE (NguoiGui = ? AND NguoiNhan = ?) OR (NguoiGui = ? AND NguoiNhan = ?)";
         $stmt = $this->db->prepare($sql);
         return $stmt->execute([$userId, $otherId, $otherId, $userId]);
     }
 
-    /** Đếm tin nhắn chưa đọc của user */
+    /* Đếm tin nhắn chưa đọc của user */
     public function countUnreadMessages(int $userId): int {
         $stmt = $this->db->prepare("SELECT COUNT(*) FROM TinNhan WHERE NguoiNhan = ? AND (TrangThaiDoc = 0 OR TrangThaiDoc IS NULL)");
         $stmt->execute([$userId]);
         return (int)$stmt->fetchColumn();
     }
 
-    /** Tìm kiếm người dùng theo tên */
+    /* Tìm kiếm người dùng theo tên */
     public function searchUsers(string $kw, int $excludeId): array {
         $stmt = $this->db->prepare("
             SELECT MaNguoiDung AS id, HoTen AS name, AnhDaiDien AS avatar, TieuDe AS headline
@@ -149,7 +149,7 @@ class MessageModel extends Database {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    /** Tìm kiếm tin nhắn trong cuộc trò chuyện */
+    /* Tìm kiếm tin nhắn trong cuộc trò chuyện */
     public function searchMessages(int $userId, int $otherId, string $keyword): array {
         $stmt = $this->db->prepare("
             SELECT tn.MaTinNhan AS id, tn.NguoiGui AS sender, tn.NoiDung AS content,
@@ -167,7 +167,7 @@ class MessageModel extends Database {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    /** Lấy tin nhắn theo ID */
+    /* Lấy tin nhắn theo ID */
     public function getMessageById(int $msgId): ?array {
         $sql = "
             SELECT tn.MaTinNhan AS id, tn.NguoiGui AS sender, tn.NoiDung AS content,
@@ -183,7 +183,7 @@ class MessageModel extends Database {
         return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
     }
 
-    /** Lấy tin nhắn đã ghim trong cuộc trò chuyện */
+    /* Lấy tin nhắn đã ghim trong cuộc trò chuyện */
     public function getPinnedMessages(int $userId, int $otherId): array {
         $stmt = $this->db->prepare("
             SELECT tn.MaTinNhan AS id, tn.NguoiGui AS sender, tn.NoiDung AS content,
@@ -200,7 +200,7 @@ class MessageModel extends Database {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    /** Lấy hình ảnh đã gửi trong cuộc trò chuyện */
+    /* Lấy hình ảnh đã gửi trong cuộc trò chuyện */
     public function getImagesInConversation(int $userId, int $otherId): array {
         $stmt = $this->db->prepare("
             SELECT tn.MaTinNhan AS id, tn.DuongDanFile AS file_path, tn.ThoiGianGui AS time
@@ -215,13 +215,13 @@ class MessageModel extends Database {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    /** Ghim / bỏ ghim tin nhắn */
+    /* Ghim / bỏ ghim tin nhắn */
     public function togglePinMessage(int $msgId, int $userId): bool {
         $stmt = $this->db->prepare("UPDATE TinNhan SET DaGhim = NOT DaGhim WHERE MaTinNhan = ? AND NguoiNhan = ?");
         return $stmt->execute([$msgId, $userId]);
     }
 
-    /** Lấy tất cả file đính kèm trong cuộc trò chuyện */
+    /* Lấy tất cả file đính kèm trong cuộc trò chuyện */
     public function getAttachmentsInConversation(int $userId, int $otherId): array {
         $stmt = $this->db->prepare("
             SELECT tn.MaTinNhan AS id, tn.DuongDanFile AS file_path, tn.ThoiGianGui AS time
