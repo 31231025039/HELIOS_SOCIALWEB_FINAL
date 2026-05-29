@@ -28,10 +28,21 @@ document.addEventListener('DOMContentLoaded', function () {
                 }]
             },
             options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } // precision: 0 để không có số lẻ
+                responsive: true,          // Tự động co giãn theo kích thước màn hình
+                maintainAspectRatio: false, // Không giữ tỉ lệ cố định, cho phép set chiều cao tự do
+                interaction: {
+                    mode: 'index',         // Hiện tooltip theo cột dọc (tất cả điểm cùng ngày)
+                    intersect: false       // Không cần hover đúng vào điểm, chỉ cần gần là hiện
+                },
+                plugins: { 
+                    legend: { display: false } // Ẩn chú thích (legend) phía trên biểu đồ
+                },
+                scales: { 
+                    y: { 
+                        beginAtZero: true,      // Trục Y luôn bắt đầu từ 0
+                        ticks: { precision: 0 } // Chỉ hiện số nguyên, không có số thập phân
+                    } 
+                }
             }
         });
     }
@@ -60,7 +71,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 responsive: true,
                 maintainAspectRatio: false,
                 scales: {
-                    y: { beginAtZero: true, ticks: { precision: 0 } },
+                    y: { beginAtZero: true, stacked: true, ticks: { precision: 0 } },
                     x: { stacked: true } // Gom 2 cột lại với nhau theo ngày
                 },
                 plugins: {
