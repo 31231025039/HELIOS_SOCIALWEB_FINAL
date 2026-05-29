@@ -5,7 +5,7 @@ class AdminCompanyModel extends Database {
 
     // Lấy tất cả công ty, sắp xếp theo tên
     public function getAllCompanies() {
-        $stmt = $this->db->query("SELECT * FROM congty ORDER BY TenCongTy ASC");
+        $stmt = $this->db->query("SELECT * FROM congty ORDER BY MaCongTy DESC");
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
@@ -61,7 +61,7 @@ class AdminCompanyModel extends Database {
     }
 
     /**
-     * HÀM MỚI: Tìm kiếm công ty theo từ khóa.
+     * Tìm kiếm công ty theo từ khóa.
      * @param string $keyword Từ khóa để tìm kiếm.
      * @return array Danh sách các công ty khớp với từ khóa.
      */
@@ -70,7 +70,7 @@ class AdminCompanyModel extends Database {
         $searchTerm = '%' . $keyword . '%';
         
         // Tìm kiếm trong cột TenCongTy
-        $sql = "SELECT * FROM congty WHERE TenCongTy LIKE ? ORDER BY TenCongTy ASC";
+        $sql = "SELECT * FROM congty WHERE TenCongTy LIKE ? ORDER BY MaCongTy DESC";
         
         $stmt = $this->db->prepare($sql);
         $stmt->execute([$searchTerm]);
