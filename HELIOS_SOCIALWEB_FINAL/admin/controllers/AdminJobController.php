@@ -11,7 +11,7 @@ class AdminJobController {
 
     private function jsonResponse($success, $message = '') {
         header('Content-Type: application/json');
-        echo json_encode(['success' => $success, 'message' => $message]);
+        echo json_encode(['success' => $success, 'message' => $message], JSON_UNESCAPED_UNICODE);
         exit();
     }
 
@@ -57,7 +57,6 @@ class AdminJobController {
             unset($_POST['skills']);
 
             $success = $this->jobModel->updateJob($id, $_POST);
-            // Chỉ cập nhật skill nếu update thông tin job thành công
             if ($success) {
                 $this->jobModel->updateJobSkills($id, $skillIds);
             }
@@ -74,7 +73,6 @@ class AdminJobController {
         }
     }
 
-    // Hàm getSkills() để lấy skill cho form sửa, giữ nguyên
     public function getSkills() {
         header('Content-Type: application/json');
         if (isset($_GET['id'])) {
