@@ -108,7 +108,7 @@ function renderJobFormFields($companies = [], $skills = []) {
             </div>
             <div class="col-md-6 mb-3">
                 <label class="form-label fw-bold">Hạn nộp hồ sơ</label>
-                <input type="date" class="form-control" name="HanNop" required>
+                <input type="date" class="form-control" name="HanNop" min="'. date("Y-m-d") .'" required>
             </div>
         </div>
         <div class="mb-3">
@@ -136,7 +136,7 @@ function renderJobFormFields($companies = [], $skills = []) {
         <h5 class="modal-title">Thêm tin tuyển dụng mới</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
-      <form id="addJobModal" action="/helios/public/admin/jobs/create" method="POST">
+      <form id="addJobForm" action="/helios/public/admin/jobs/create" method="POST">
         <div class="modal-body">
             <?php echo renderJobFormFields($companies, $skills); ?>
         </div>
