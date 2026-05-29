@@ -1,5 +1,5 @@
 <?php
-// File: admin/controllers/AdminCompanyController.php (Đã cập nhật để dùng AJAX)
+// File: admin/controllers/AdminCompanyController.php 
 
 class AdminCompanyController {
     
