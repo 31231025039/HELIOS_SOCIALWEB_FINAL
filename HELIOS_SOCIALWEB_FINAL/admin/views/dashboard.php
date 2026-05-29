@@ -1,5 +1,4 @@
 <?php
-    // Các biến này được truyền từ AdminDashboardController
     $selectedMonth = $selectedMonth ?? (int) date('n');
     $selectedYear = $selectedYear ?? (int) date('Y');
     $dashboardData = $dashboardData ?? ['kpis' => [], 'charts' => []];
