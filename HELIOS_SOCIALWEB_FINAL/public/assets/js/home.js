@@ -1,420 +1,430 @@
-/**
- * Trang chủ Helios
- */
-(function() {
+(function () {
   "use strict";
 
-  let currentEditPostId = null;
-  let currentEditImages = [];
+  const BASE = "/helios/public/home";
+  const reactions = {
+    "Thích": ["bi-hand-thumbs-up-fill", "text-primary", "reaction-like"],
+    "Quan tâm": ["bi-heart-fill", "text-danger", "reaction-care"],
+    "Hữu ích": ["bi-lightbulb-fill", "text-warning", "reaction-useful"],
+    "Chúc mừng": ["bi-trophy-fill", "text-success", "reaction-congrats"]
+  };
 
-  // ===== SEARCH TOOLTIP =====
-  function initSearchTooltip() {
-    const searchBar = document.getElementById("searchBar");
-    const searchTooltip = document.getElementById("searchTooltip");
+  let editPostId = null;
+  let editImages = [];
+  let editNewFiles = [];
+  let createFiles = [];
+
+  const $ = (selector, root = document) => root.querySelector(selector);
+  const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
+  const fd = (data) => {
+    const form = new FormData();
+    Object.entries(data).forEach(([key, value]) => {
+      if (value !== null && value !== undefined && value !== "") form.append(key, value);
+    });
+    return form;
+  };
+  const post = (url, data) => fetch(url, { method: "POST", body: fd(data) }).then(r => r.json());
+  const esc = (text) => {
+    const div = document.createElement("div");
+    div.textContent = text ?? "";
+    return div.innerHTML;
+  };
+  const attr = (text) => esc(text).replace(/"/g, "&quot;");
+
+  function toast(text, type = "success") {
+    const el = document.createElement("div");
+    el.className = `copy-toast bg-${type}`;
+    el.textContent = text;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 2000);
+  }
+
+  function dateText(value) {
+    const date = new Date(value);
+    const diff = Math.floor((new Date() - date) / 1000);
+    if (Number.isNaN(diff)) return "";
+    if (diff < 60) return "vừa xong";
+    if (diff < 3600) return `${Math.floor(diff / 60)} phút trước`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)} giờ trước`;
+    return date.toLocaleDateString("vi-VN");
+  }
+
+  function renderLike(btn, type) {
+    btn.classList.toggle("is-reacted", Boolean(type));
+    if (!type || !reactions[type]) {
+      btn.innerHTML = '<i class="bi bi-hand-thumbs-up"></i> <span>Thích</span>';
+      return;
+    }
+    const [icon, color] = reactions[type];
+    btn.innerHTML = `<i class="bi ${icon} ${color}"></i> <span>${esc(type)}</span>`;
+  }
+
+  async function refreshReactions(article) {
+    const postId = article.dataset.postId;
+    const box = $(".reactions-row", article);
+    if (!box) return;
+
+    const data = await post(`${BASE}/get-reaction-counts`, { post_id: postId });
+    if (!data.success) return;
+
+    const html = Object.entries(data.counts).map(([type, count]) => {
+      const [icon, color, cls] = reactions[type] || reactions["Thích"];
+      return `<span class="reaction-pill ${cls}"><i class="bi ${icon} ${color}"></i> ${count}</span>`;
+    }).join("");
+    box.innerHTML = html || '<span class="text-muted">0 phản ứng</span>';
+  }
+
+  function setCommentCount(postId, count) {
+    const el = $(`article[data-post-id="${postId}"] .comment-count`);
+    if (el) el.textContent = Math.max(0, Number(count) || 0);
+  }
+
+  function clearReply(section) {
+    const input = $(".reply-parent-id", section);
+    const label = $("[data-reply-label]", section);
+    if (input) input.value = "";
+    if (label) {
+      $("strong", label).textContent = "";
+      label.classList.add("d-none");
+    }
+  }
+
+  async function loadComments(postId) {
+    const box = $(`#comments-${postId}`);
+    if (!box) return 0;
+
+    const data = await post(`${BASE}/get-comments`, { post_id: postId });
+    if (!data.success || !data.comments.length) {
+      box.innerHTML = '<div class="text-muted small">Chưa có bình luận nào</div>';
+      return 0;
+    }
+
+    box.innerHTML = renderComments(data.comments);
+    return data.comments.length;
+  }
+
+  function renderComments(comments) {
+    const groups = {};
+    comments.forEach(c => {
+      const key = c.MaBinhLuanCha || "root";
+      groups[key] ||= [];
+      groups[key].push(c);
+    });
+
+    const list = (parent = "root", level = 0) => (groups[parent] || []).map(c => {
+      const actions = [
+        `<button class="btn btn-link btn-sm p-0 btn-reply-comment" data-comment-id="${c.MaBinhLuan}" data-comment-author="${attr(c.HoTen)}">Trả lời</button>`
+      ];
+      if (c.can_edit) {
+        actions.push(`<button class="btn btn-link btn-sm p-0 btn-edit-comment" data-comment-id="${c.MaBinhLuan}">Sửa</button>`);
+        actions.push(`<button class="btn btn-link btn-sm p-0 text-danger btn-delete-comment" data-comment-id="${c.MaBinhLuan}">Xóa</button>`);
+      }
+      if (c.can_hide) {
+        actions.push(`<button class="btn btn-link btn-sm p-0 text-danger btn-hide-comment" data-comment-id="${c.MaBinhLuan}">Ẩn</button>`);
+      }
+
+      return `
+        <div class="comment-item d-flex gap-2 mb-2 ${level ? "comment-reply" : ""}" data-comment-id="${c.MaBinhLuan}">
+          <div class="comment-avatar-small" style="background:#6c5ce7;">${esc((c.HoTen || "?").charAt(0))}</div>
+          <div class="flex-grow-1">
+            <div class="comment-bubble">
+              <strong class="small">${esc(c.HoTen)}</strong>
+              <p class="comment-content mb-0 small">${esc(c.NoiDung).replace(/\n/g, "<br>")}</p>
+            </div>
+            <div class="comment-actions text-muted">
+              <small>${dateText(c.ThoiGianDang)}</small>${actions.join('<span class="mx-1">·</span>')}
+            </div>
+            ${list(c.MaBinhLuan, level + 1)}
+          </div>
+        </div>
+      `;
+    }).join("");
+
+    return list();
+  }
+
+  async function submitComment(btn) {
+    const postId = btn.dataset.postId;
+    const section = $(`#comment-section-${postId}`);
+    const input = $(".comment-input", section);
+    const parent = $(".reply-parent-id", section);
+    const content = input.value.trim();
+    if (!content) return;
+
+    const data = await post(`${BASE}/add-comment`, {
+      post_id: postId,
+      content,
+      parent_comment_id: parent.value
+    });
+    if (!data.success) return;
+
+    input.value = "";
+    clearReply(section);
+    setCommentCount(postId, await loadComments(postId));
+  }
+
+  function previewFiles(input, box, counter, filesStore, removable = false) {
+    const files = [...input.files];
+    if (files.length > 10) {
+      alert("Chỉ được chọn tối đa 10 ảnh!");
+      input.value = "";
+      return [];
+    }
+
+    filesStore.splice(0, filesStore.length, ...files);
+    if (counter) counter.textContent = `${files.length}/10 ảnh`;
+    box.innerHTML = "";
+
+    files.forEach((file, index) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const item = document.createElement("div");
+        item.className = "position-relative";
+        item.style.cssText = "width:100px;height:100px";
+        item.innerHTML = `
+          <img src="${e.target.result}" class="img-fluid rounded" style="width:100%;height:100%;object-fit:cover;" alt="Ảnh xem trước">
+          ${removable ? `<button type="button" class="btn-close position-absolute top-0 end-0 bg-white rounded-circle m-1 btn-remove-preview-image" data-index="${index}" style="width:20px;height:20px"></button>` : ""}
+        `;
+        box.appendChild(item);
+      };
+      reader.readAsDataURL(file);
+    });
+    return files;
+  }
+
+  function removeCreatePreview(index) {
+    createFiles.splice(index, 1);
+    const input = $("#postImagesInput");
+    const transfer = new DataTransfer();
+    createFiles.forEach(file => transfer.items.add(file));
+    input.files = transfer.files;
+    input.dispatchEvent(new Event("change"));
+  }
+
+  async function openEdit(postId) {
+    const modalEl = $("#editPostModal");
+    if (!modalEl || !window.bootstrap) return;
+
+    const data = await fetch(`${BASE}/get-post-edit?post_id=${postId}`).then(r => r.json());
+    if (!data.success || !data.post) return;
+
+    editPostId = postId;
+    editImages = data.images || [];
+    editNewFiles = [];
+    $("#editPostContent").value = data.post.NoiDung || "";
+    $("#editPostStatus").value = data.post.TrangThai;
+    $("#editNewImages").value = "";
+    $("#editNewPreviewContainer").innerHTML = "";
+    $("#editImageCountText").textContent = "";
+    renderEditImages();
+    bootstrap.Modal.getOrCreateInstance(modalEl).show();
+  }
+
+  function renderEditImages() {
+    const box = $("#editImagesContainer");
+    if (!box) return;
+    if (!editImages.length) {
+      box.innerHTML = '<div class="text-muted small">Chưa có ảnh nào</div>';
+      return;
+    }
+
+    box.innerHTML = editImages.map(img => `
+      <div class="position-relative" style="width:100px;height:100px">
+        <img src="${img.DuongDanURL}" class="img-fluid rounded" style="width:100%;height:100%;object-fit:cover;" alt="Ảnh bài viết">
+        <button type="button" class="btn-close position-absolute top-0 end-0 bg-white rounded-circle m-1 btn-delete-edit-image" data-image-id="${img.MaHinhAnh}" style="width:20px;height:20px"></button>
+      </div>
+    `).join("");
+  }
+
+  async function saveEdit() {
+    const data = await post(`${BASE}/update-post`, {
+      post_id: editPostId,
+      content: $("#editPostContent").value,
+      status: $("#editPostStatus").value
+    });
+    if (!data.success) {
+      alert("Không thể cập nhật");
+      return;
+    }
+
+    if (editNewFiles.length) {
+      const form = new FormData();
+      form.append("post_id", editPostId);
+      editNewFiles.forEach(file => form.append("new_images[]", file));
+      await fetch(`${BASE}/add-post-images`, { method: "POST", body: form });
+    }
+    location.reload();
+  }
+
+  async function handleClick(e) {
+    const target = e.target;
+    const article = target.closest("article");
+    const reactionBtn = target.closest(".reaction-opt");
+    const toggleComments = target.closest(".btn-toggle-comments");
+    const submit = target.closest(".btn-submit-comment");
+    const reply = target.closest(".btn-reply-comment");
+    const cancelReply = target.closest(".btn-cancel-reply");
+    const editComment = target.closest(".btn-edit-comment");
+    const deleteComment = target.closest(".btn-delete-comment");
+    const hideComment = target.closest(".btn-hide-comment");
+    const deletePost = target.closest(".btn-delete-post");
+    const editPost = target.closest(".btn-edit-post");
+    const share = target.closest(".btn-share");
+    const removePreview = target.closest(".btn-remove-preview-image");
+    const deleteEditImage = target.closest(".btn-delete-edit-image");
+    const saveEditBtn = target.closest("#saveEditPostBtn");
+    const postImage = target.closest(".post-image");
+
+    if (reactionBtn && article) {
+      e.preventDefault();
+      const data = await post(`${BASE}/react`, {
+        post_id: article.dataset.postId,
+        reaction_type: reactionBtn.dataset.reaction
+      });
+      if (data.success) {
+        renderLike($(".btn-like", article), data.action === "removed" ? null : data.new_reaction);
+        await refreshReactions(article);
+      }
+      return;
+    }
+
+    if (toggleComments) {
+      const postId = toggleComments.dataset.postId;
+      const section = $(`#comment-section-${postId}`);
+      section.classList.toggle("d-none");
+      if (!section.classList.contains("d-none")) {
+        await loadComments(postId);
+        section.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }
+      return;
+    }
+
+    if (submit) return submitComment(submit);
+
+    if (reply && article) {
+      const section = $(".comment-section", article);
+      $(".reply-parent-id", section).value = reply.dataset.commentId;
+      $("[data-reply-label] strong", section).textContent = reply.dataset.commentAuthor || "bình luận";
+      $("[data-reply-label]", section).classList.remove("d-none");
+      $(".comment-input", section).focus();
+      return;
+    }
+
+    if (cancelReply) return clearReply(cancelReply.closest(".comment-section"));
+
+    if (editComment) {
+      const item = editComment.closest(".comment-item");
+      const content = $(".comment-content", item);
+      const next = prompt("Sửa bình luận:", content.innerText);
+      if (!next || next === content.innerText) return;
+      const data = await post(`${BASE}/update-comment`, { comment_id: editComment.dataset.commentId, content: next });
+      if (data.success) content.innerHTML = esc(next).replace(/\n/g, "<br>");
+      return;
+    }
+
+    if ((deleteComment || hideComment) && article) {
+      const btn = deleteComment || hideComment;
+      const action = deleteComment ? "delete-comment" : "hide-comment";
+      const message = deleteComment ? "Xóa bình luận này?" : "Ẩn bình luận này khỏi bài viết?";
+      if (!confirm(message)) return;
+      const data = await post(`${BASE}/${action}`, { comment_id: btn.dataset.commentId });
+      if (data.success) setCommentCount(article.dataset.postId, await loadComments(article.dataset.postId));
+      return;
+    }
+
+    if (deletePost) {
+      if (!confirm("Xóa bài viết này?")) return;
+      const data = await post(`${BASE}/delete-post`, { post_id: deletePost.dataset.postId });
+      if (data.success) deletePost.closest("article").remove();
+      return;
+    }
+
+    if (editPost) return openEdit(editPost.dataset.postId);
+    if (saveEditBtn) return saveEdit();
+    if (removePreview) return removeCreatePreview(Number(removePreview.dataset.index));
+
+    if (deleteEditImage) {
+      if (!confirm("Xóa ảnh này?")) return;
+      const data = await post(`${BASE}/delete-post-image`, { image_id: deleteEditImage.dataset.imageId });
+      if (data.success) {
+        editImages = editImages.filter(img => String(img.MaHinhAnh) !== String(deleteEditImage.dataset.imageId));
+        renderEditImages();
+      }
+      return;
+    }
+
+    if (share) {
+      const input = $("#shareLinkInput");
+      const modal = $("#shareModal");
+      if (!input || !modal || !window.bootstrap) return;
+      input.value = `${window.location.origin}/helios/public/home?post=${share.dataset.postId}`;
+      $("#copySuccessMsg")?.classList.add("d-none");
+      bootstrap.Modal.getOrCreateInstance(modal).show();
+      return;
+    }
+
+    if (target.closest("#copyShareLinkBtn")) {
+      const input = $("#shareLinkInput");
+      await navigator.clipboard.writeText(input.value);
+      $("#copySuccessMsg")?.classList.remove("d-none");
+      toast("Đã sao chép liên kết");
+      return;
+    }
+
+    if (postImage && window.bootstrap) {
+      document.body.insertAdjacentHTML("beforeend", `
+        <div class="modal fade" id="imgModal" tabindex="-1">
+          <div class="modal-dialog modal-dialog-centered modal-xl">
+            <div class="modal-content bg-transparent border-0">
+              <div class="modal-body text-center">
+                <img src="${postImage.src}" class="img-fluid rounded" style="max-height:90vh;" alt="Ảnh bài viết">
+                <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3" data-bs-dismiss="modal"></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `);
+      const modal = $("#imgModal");
+      modal.addEventListener("hidden.bs.modal", () => modal.remove());
+      bootstrap.Modal.getOrCreateInstance(modal).show();
+    }
+  }
+
+  function init() {
+    const searchBar = $("#searchBar");
+    const searchTooltip = $("#searchTooltip");
     if (searchBar && searchTooltip) {
       searchBar.addEventListener("mouseenter", () => searchTooltip.style.display = "block");
       searchBar.addEventListener("mouseleave", () => searchTooltip.style.display = "none");
     }
-  }
 
-  // ===== SHARE MODAL (có link + nút sao chép) =====
-  function initShare() {
-    const shareModal = new bootstrap.Modal(document.getElementById('shareModal'));
-    const shareLinkInput = document.getElementById('shareLinkInput');
-    const copyBtn = document.getElementById('copyShareLinkBtn');
-    const copyMsg = document.getElementById('copySuccessMsg');
-
-    document.addEventListener('click', (e) => {
-      const shareBtn = e.target.closest('.btn-share');
-      if (shareBtn) {
-        e.preventDefault();
-        const postId = shareBtn.dataset.postId;
-        const link = window.location.origin + "/helios/public/home?post=" + postId;
-        shareLinkInput.value = link;
-        if (copyMsg) copyMsg.classList.add('d-none');
-        shareModal.show();
-      }
-    });
-
-    if (copyBtn) {
-      copyBtn.addEventListener('click', () => {
-        shareLinkInput.select();
-        navigator.clipboard.writeText(shareLinkInput.value);
-        if (copyMsg) {
-          copyMsg.classList.remove('d-none');
-          setTimeout(() => copyMsg.classList.add('d-none'), 2000);
-        }
-        showToast("✓ Đã sao chép liên kết", "success");
-      });
-    }
-  }
-
-  function showToast(msg, type = "success") {
-    const toast = document.createElement('div');
-    toast.className = `copy-toast bg-${type}`;
-    toast.innerHTML = msg;
-    document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), 2000);
-  }
-
-  // ===== TAB CHANGE =====
-  function initTabChange() {
-    const tabs = document.querySelectorAll('#composeModal .nav-link');
-    const postTypeInput = document.getElementById('postTypeInput');
-    tabs.forEach(tab => {
-      tab.addEventListener('click', function() {
-        postTypeInput.value = this.getAttribute('data-bs-target') === '#postTab' ? 'post' : 'event';
+    $$("#composeModal .nav-link").forEach(tab => {
+      tab.addEventListener("click", () => {
+        const input = $("#postTypeInput");
+        if (input) input.value = tab.dataset.bsTarget === "#postTab" ? "post" : "event";
       });
     });
-  }
 
-  // ===== REACTION (1 người 1 loại) =====
-  function initReactions() {
-    document.addEventListener('click', async (e) => {
-      const opt = e.target.closest('.reaction-opt');
-      if (!opt) return;
-      e.preventDefault();
-      const reaction = opt.getAttribute('data-reaction');
-      const article = opt.closest('article');
-      const postId = article.dataset.postId;
-      const likeBtn = article.querySelector('.btn-like');
-      const fd = new FormData();
-      fd.append('post_id', postId);
-      fd.append('reaction_type', reaction);
-      const res = await fetch('/helios/public/home/react', { method: 'POST', body: fd });
-      const data = await res.json();
-      if (data.success) {
-        if (data.action === 'removed') {
-          likeBtn.innerHTML = `<i class="bi bi-hand-thumbs-up"></i> Thích`;
-        } else {
-          let icon = '';
-          switch (data.new_reaction) {
-            case 'Thích': icon = 'bi-hand-thumbs-up-fill'; break;
-            case 'Quan tâm': icon = 'bi-heart-fill'; break;
-            case 'Hữu ích': icon = 'bi-lightbulb-fill'; break;
-            case 'Chúc mừng': icon = 'bi-trophy-fill'; break;
-            default: icon = 'bi-hand-thumbs-up-fill';
-          }
-          likeBtn.innerHTML = `<i class="bi ${icon}"></i> ${data.new_reaction}`;
-        }
-        const reactionsDiv = article.querySelector('.reactions-row');
-        if (reactionsDiv) {
-          const fdCount = new FormData();
-          fdCount.append('post_id', postId);
-          const countRes = await fetch('/helios/public/home/get-reaction-counts', { method: 'POST', body: fdCount });
-          const countData = await countRes.json();
-          if (countData.success) {
-            let html = '';
-            const icons = {
-              'Thích': '<i class="bi bi-hand-thumbs-up-fill"></i>',
-              'Quan tâm': '<i class="bi bi-heart-fill"></i>',
-              'Hữu ích': '<i class="bi bi-lightbulb-fill"></i>',
-              'Chúc mừng': '<i class="bi bi-trophy-fill"></i>'
-            };
-            for (let [type, count] of Object.entries(countData.counts)) {
-              html += `<span class="reaction-pill r-${type.toLowerCase().replace(/ /g, '')}">${icons[type]} ${count}</span>`;
-            }
-            if (!html) html = '<span class="text-muted">0 phản ứng</span>';
-            reactionsDiv.innerHTML = html;
-          }
-        }
-      }
-    });
-  }
-
-  // ===== BÌNH LUẬN =====
-  function initComments() {
-    document.addEventListener('click', (e) => {
-      const btn = e.target.closest('.btn-toggle-comments');
-      if (btn) {
-        e.preventDefault();
-        const postId = btn.dataset.postId;
-        const section = document.getElementById(`comment-section-${postId}`);
-        if (section.classList.contains('d-none')) {
-          section.classList.remove('d-none');
-          loadComments(postId);
-          section.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        } else {
-          section.classList.add('d-none');
-        }
-      }
-    });
-    
-    document.addEventListener('click', async (e) => {
-      const btn = e.target.closest('.btn-submit-comment');
-      if (btn) {
-        const postId = btn.dataset.postId;
-        const textarea = document.querySelector(`#comment-section-${postId} .comment-input`);
-        const content = textarea.value.trim();
-        if (!content) return;
-        const fd = new FormData();
-        fd.append('post_id', postId);
-        fd.append('content', content);
-        const res = await fetch('/helios/public/home/add-comment', { method: 'POST', body: fd });
-        const data = await res.json();
-        if (data.success) {
-          textarea.value = '';
-          loadComments(postId);
-          updateCommentCount(postId, 1);
-        }
-      }
-    });
-    
-    document.addEventListener('click', async (e) => {
-      const btn = e.target.closest('.btn-edit-comment');
-      if (btn) {
-        const commentId = btn.dataset.commentId;
-        const commentDiv = btn.closest('.comment-item');
-        const contentP = commentDiv.querySelector('.comment-content');
-        const oldContent = contentP.innerText;
-        const newContent = prompt('Sửa bình luận:', oldContent);
-        if (newContent && newContent !== oldContent) {
-          const fd = new FormData();
-          fd.append('comment_id', commentId);
-          fd.append('content', newContent);
-          const res = await fetch('/helios/public/home/update-comment', { method: 'POST', body: fd });
-          const data = await res.json();
-          if (data.success) {
-            contentP.innerHTML = newContent.replace(/\n/g, '<br>');
-            showToast("Đã cập nhật bình luận", "success");
-          }
-        }
-      }
-    });
-    
-    document.addEventListener('click', async (e) => {
-      const btn = e.target.closest('.btn-delete-comment');
-      if (btn && confirm('Xóa bình luận này?')) {
-        const commentId = btn.dataset.commentId;
-        const fd = new FormData();
-        fd.append('comment_id', commentId);
-        const res = await fetch('/helios/public/home/delete-comment', { method: 'POST', body: fd });
-        const data = await res.json();
-        if (data.success) {
-          btn.closest('.comment-item').remove();
-          const postId = btn.closest('article').dataset.postId;
-          updateCommentCount(postId, -1);
-          showToast("Đã xóa bình luận", "success");
-        }
-      }
-    });
-  }
-
-  async function loadComments(postId) {
-    const container = document.getElementById(`comments-${postId}`);
-    const fd = new FormData();
-    fd.append('post_id', postId);
-    const res = await fetch('/helios/public/home/get-comments', { method: 'POST', body: fd });
-    const data = await res.json();
-    if (data.success && data.comments.length) {
-      let html = '';
-      data.comments.forEach(c => {
-        const isOwner = (c.MaNguoiDung == 1);
-        html += `
-          <div class="comment-item d-flex gap-2 mb-2" data-comment-id="${c.MaBinhLuan}">
-            <div class="comment-avatar-small" style="background:#6c5ce7;">${escapeHtml(c.HoTen.charAt(0))}</div>
-            <div class="flex-grow-1">
-              <div class="bg-light rounded p-2">
-                <div class="d-flex justify-content-between align-items-start">
-                  <strong class="small">${escapeHtml(c.HoTen)}</strong>
-                  ${isOwner ? `
-                    <div class="dropdown">
-                      <button class="btn btn-sm btn-link text-muted p-0" data-bs-toggle="dropdown"><i class="bi bi-three-dots-vertical"></i></button>
-                      <ul class="dropdown-menu dropdown-menu-end">
-                        <li><button class="dropdown-item btn-edit-comment" data-comment-id="${c.MaBinhLuan}"><i class="bi bi-pencil me-2"></i>Sửa</button></li>
-                        <li><button class="dropdown-item text-danger btn-delete-comment" data-comment-id="${c.MaBinhLuan}"><i class="bi bi-trash me-2"></i>Xóa</button></li>
-                      </ul>
-                    </div>
-                  ` : ''}
-                </div>
-                <p class="comment-content mb-0 small">${escapeHtml(c.NoiDung).replace(/\n/g, '<br>')}</p>
-              </div>
-              <small class="text-muted" style="font-size:10px;">${formatDate(c.ThoiGianDang)}</small>
-            </div>
-          </div>
-        `;
-      });
-      container.innerHTML = html;
-    } else {
-      container.innerHTML = '<div class="text-muted small">Chưa có bình luận nào</div>';
-    }
-  }
-
-  function updateCommentCount(postId, delta) {
-    const countSpan = document.querySelector(`article[data-post-id="${postId}"] .comment-count`);
-    if (countSpan) {
-      let cur = parseInt(countSpan.textContent) || 0;
-      countSpan.textContent = cur + delta;
-    }
-  }
-
-  // ===== XÓA BÀI VIẾT =====
-  function initDeletePost() {
-    document.addEventListener('click', async (e) => {
-      const btn = e.target.closest('.btn-delete-post');
-      if (btn && confirm('Xóa bài viết này?')) {
-        const postId = btn.dataset.postId;
-        const fd = new FormData();
-        fd.append('post_id', postId);
-        const res = await fetch('/helios/public/home/delete-post', { method: 'POST', body: fd });
-        const data = await res.json();
-        if (data.success) {
-          document.querySelector(`article[data-post-id="${postId}"]`).remove();
-          showToast("Đã xóa bài viết", "success");
-        } else {
-          alert('Không thể xóa');
-        }
-      }
-    });
-  }
-
-  // ===== SỬA BÀI VIẾT (có quản lý ảnh) =====
-  function initEditPost() {
-    const editModal = new bootstrap.Modal(document.getElementById('editPostModal'));
-    const editContent = document.getElementById('editPostContent');
-    const editStatus = document.getElementById('editPostStatus');
-    const saveBtn = document.getElementById('saveEditPostBtn');
-    const editImagesContainer = document.getElementById('editImagesContainer');
-    const editNewImages = document.getElementById('editNewImages');
-    const editNewPreviewContainer = document.getElementById('editNewPreviewContainer');
-    const editImageCountText = document.getElementById('editImageCountText');
-    
-    let newImageFiles = [];
-    let currentPostId = null;
-
-    document.addEventListener('click', async (e) => {
-      const btn = e.target.closest('.btn-edit-post');
-      if (btn) {
-        currentPostId = btn.dataset.postId;
-        const res = await fetch(`/helios/public/home/get-post-edit?post_id=${currentPostId}`);
-        const data = await res.json();
-        if (data.success && data.post) {
-          editContent.value = data.post.NoiDung;
-          editStatus.value = data.post.TrangThai;
-          currentEditImages = data.images || [];
-          renderEditImages();
-          editModal.show();
-        }
-      }
+    $("#postImagesInput")?.addEventListener("change", e => {
+      previewFiles(e.target, $("#imagePreviewContainer"), $("#imageCountText"), createFiles, true);
     });
 
-    function renderEditImages() {
-      if (!editImagesContainer) return;
-      editImagesContainer.innerHTML = '';
-      if (currentEditImages.length === 0) {
-        editImagesContainer.innerHTML = '<div class="text-muted small">Chưa có ảnh nào</div>';
+    $("#editNewImages")?.addEventListener("change", e => {
+      const files = [...e.target.files];
+      if (files.length + editImages.length > 10) {
+        alert("Tổng số ảnh không được vượt quá 10!");
+        e.target.value = "";
         return;
       }
-      currentEditImages.forEach(img => {
-        const div = document.createElement('div');
-        div.className = 'position-relative';
-        div.style.width = '100px';
-        div.style.height = '100px';
-        div.innerHTML = `
-          <img src="${img.DuongDanURL}" class="img-fluid rounded" style="width:100%; height:100%; object-fit:cover;">
-          <button type="button" class="btn-close position-absolute top-0 end-0 bg-white rounded-circle m-1" style="width:20px; height:20px;" data-image-id="${img.MaHinhAnh}" onclick="deleteEditImage(${img.MaHinhAnh})"></button>
-        `;
-        editImagesContainer.appendChild(div);
-      });
-    }
+      editNewFiles = files;
+      $("#editImageCountText").textContent = files.length ? `+${files.length} ảnh mới` : "";
+      previewFiles(e.target, $("#editNewPreviewContainer"), null, editNewFiles);
+    });
 
-    window.deleteEditImage = async (imageId) => {
-      if (!confirm('Xóa ảnh này?')) return;
-      const fd = new FormData();
-      fd.append('image_id', imageId);
-      const res = await fetch('/helios/public/home/delete-post-image', { method: 'POST', body: fd });
-      const data = await res.json();
-      if (data.success) {
-        currentEditImages = currentEditImages.filter(img => img.MaHinhAnh != imageId);
-        renderEditImages();
-        showToast("Đã xóa ảnh", "success");
-      }
-    };
-
-    if (editNewImages) {
-      editNewImages.addEventListener('change', (e) => {
-        const files = Array.from(e.target.files);
-        if (files.length + currentEditImages.length > 10) {
-          alert('Tổng số ảnh không được vượt quá 10!');
-          editNewImages.value = '';
-          return;
-        }
-        newImageFiles = files;
-        editImageCountText.textContent = `+${files.length} ảnh mới`;
-        editNewPreviewContainer.innerHTML = '';
-        files.forEach((file, idx) => {
-          const reader = new FileReader();
-          reader.onload = (ev) => {
-            const div = document.createElement('div');
-            div.className = 'position-relative';
-            div.style.width = '100px';
-            div.style.height = '100px';
-            div.innerHTML = `
-              <img src="${ev.target.result}" class="img-fluid rounded" style="width:100%; height:100%; object-fit:cover;">
-              <button type="button" class="btn-close position-absolute top-0 end-0 bg-white rounded-circle m-1" style="width:20px; height:20px;" onclick="this.parentElement.remove(); newImageFiles = newImageFiles.filter((_, i) => i != ${idx})">
-            `;
-            editNewPreviewContainer.appendChild(div);
-          };
-          reader.readAsDataURL(file);
-        });
-      });
-    }
-
-    saveBtn.addEventListener('click', async () => {
-      const fd = new FormData();
-      fd.append('post_id', currentPostId);
-      fd.append('content', editContent.value);
-      fd.append('status', editStatus.value);
-      const res = await fetch('/helios/public/home/update-post', { method: 'POST', body: fd });
-      const data = await res.json();
-      if (data.success) {
-        if (newImageFiles.length > 0) {
-          const imgFd = new FormData();
-          imgFd.append('post_id', currentPostId);
-          newImageFiles.forEach(file => {
-            imgFd.append('new_images[]', file);
-          });
-          await fetch('/helios/public/home/add-post-images', { method: 'POST', body: imgFd });
-        }
-        location.reload();
-      } else {
-        alert('Không thể cập nhật');
-      }
+    document.addEventListener("click", (e) => {
+      handleClick(e).catch(() => toast("Có lỗi xảy ra, thử lại giúp mình", "danger"));
     });
   }
-
-  // ===== HELPER =====
-  function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-  }
-
-  function formatDate(dateStr) {
-    const d = new Date(dateStr);
-    const now = new Date();
-    const diff = Math.floor((now - d) / 1000);
-    if (diff < 60) return 'vừa xong';
-    if (diff < 3600) return Math.floor(diff / 60) + ' phút trước';
-    if (diff < 86400) return Math.floor(diff / 3600) + ' giờ trước';
-    return d.toLocaleDateString('vi-VN');
-  }
-
-  // ===== KHỞI TẠO =====
-  function init() {
-    initSearchTooltip();
-    initShare();
-    initTabChange();
-    initReactions();
-    initComments();
-    initDeletePost();
-    initEditPost();
-  }
-
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", init);
-  } else {
-    init();
-  }
-
+  
+  document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", init) : init();
 })();
