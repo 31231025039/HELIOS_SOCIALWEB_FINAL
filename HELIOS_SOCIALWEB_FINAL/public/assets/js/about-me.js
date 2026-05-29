@@ -80,12 +80,17 @@ document.addEventListener('DOMContentLoaded', function() {
     const setupImageUpload = (formId, previewId, imageDisplayId, modalId) => {
         const form = document.getElementById(formId);
         if (!form) return;
-        
-        const modalInstance = bootstrap.Modal.getInstance(document.getElementById(modalId));
+
+        // Lấy instance của Modal (hộp thoại)
+        let modalInstance = bootstrap.Modal.getInstance(document.getElementById(modalId));
+        if (!modalInstance) {
+            modalInstance = new bootstrap.Modal(document.getElementById(modalId));
+        }
+
         const fileInput = form.querySelector('input[type="file"]');
         const preview = document.getElementById(previewId);
 
-        // Hiển thị ảnh preview khi chọn file
+        // Hiển thị ảnh preview ngay khi người dùng vừa chọn file từ máy tính
         fileInput.addEventListener('change', function() {
             if (this.files && this.files[0]) {
                 const reader = new FileReader();
@@ -96,11 +101,14 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        // Gửi form bằng AJAX khi submit
+        // Gửi form bằng AJAX khi bấm "Lưu thay đổi"
         handleFormSubmit(form, (data) => {
-            document.getElementById(imageDisplayId).src = '/helios/public' + data.filePath;
+            // Tắt popup
             if(modalInstance) modalInstance.hide();
-            alert('Cập nhật ảnh thành công!');
+            
+            // Thay vì chỉ đổi src của 1 ảnh, ta reload lại trang 
+            // để Avatar trên thanh Navbar cũng được cập nhật đồng bộ!
+            location.reload(); 
         });
     };
     
