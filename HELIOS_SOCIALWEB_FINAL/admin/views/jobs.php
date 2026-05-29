@@ -23,11 +23,12 @@
 
 <div class="card">
     <div class="card-body">
+        <div class="table-responsive">
         <table class="table table-hover">
             <thead>
                 <tr>
                     <th>Tiêu đề</th>
-                    <th>Mô tả ngắn</th>
+                    <th class="col-content-medium">Mô tả ngắn</th>
                     <th>Công ty</th>
                     <th>Hạn nộp</th>
                     <th>Hành động</th>
@@ -42,7 +43,7 @@
                     <?php foreach ($jobs as $job): ?>
                         <tr>
                             <td><?php echo htmlspecialchars($job['TieuDe']); ?></td>
-                            <td><?php echo htmlspecialchars(mb_substr($job['MoTa'], 0, 50)) . '...'; ?></td>
+                            <td class="col-content-medium"><?php echo htmlspecialchars(mb_substr($job['MoTa'], 0, 50)) . '...'; ?></td>
                             <td><?php echo htmlspecialchars($job['TenCongTy']); ?></td>
                             <td><?php echo date('d/m/Y', strtotime($job['HanNop'])); ?></td>
                             <td>
@@ -58,6 +59,7 @@
                 <?php endif; ?>
             </tbody>
         </table>
+        </div>
     </div>
 </div>
 
