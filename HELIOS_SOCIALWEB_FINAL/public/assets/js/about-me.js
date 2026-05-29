@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const formData = new FormData(this);
             const url = this.getAttribute('action');
             const submitButton = this.querySelector('button[type="submit"]');
-            if (!submitButton) return; // Dừng nếu form không có nút submit
+            if (!submitButton) return; 
 
             const originalButtonText = submitButton.innerHTML;
             
@@ -26,7 +26,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 const data = await response.json();
 
                 if (data.success) {
-                    // Gọi callback nếu submit thành công
                     if (successCallback) {
                         successCallback(data, form);
                     }
@@ -37,7 +36,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.error('Error submitting form:', error);
                 alert('Đã có lỗi kết nối xảy ra. Vui lòng thử lại.');
             } finally {
-                // Luôn khôi phục lại nút bấm
                 submitButton.disabled = false;
                 submitButton.innerHTML = originalButtonText;
             }
@@ -103,11 +101,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Gửi form bằng AJAX khi bấm "Lưu thay đổi"
         handleFormSubmit(form, (data) => {
-            // Tắt popup
             if(modalInstance) modalInstance.hide();
             
-            // Thay vì chỉ đổi src của 1 ảnh, ta reload lại trang 
-            // để Avatar trên thanh Navbar cũng được cập nhật đồng bộ!
             location.reload(); 
         });
     };
@@ -124,5 +119,13 @@ document.addEventListener('DOMContentLoaded', function() {
     if (coverModalEl) {
         const coverModal = new bootstrap.Modal(coverModalEl);
         setupImageUpload('editCoverForm', 'coverPreview', 'coverImage', 'editCoverModal');
+    }
+
+    const multiSkillEl = document.getElementById('multiSkillSelect');
+    if (multiSkillEl && typeof TomSelect !== 'undefined') {
+        new TomSelect(multiSkillEl, {
+            plugins: ['remove_button'], // Tính năng nút x để xóa
+            sortField: { field: "text", direction: "asc" }
+        });
     }
 });
