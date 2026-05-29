@@ -1,5 +1,5 @@
-<!-- File: admin/views/layouts/main.php (đã cập nhật) -->
 <?php
+    $baseUrl = '/helios/public/'; 
     $pageTitle = $pageTitle ?? 'Admin Dashboard';
     $contentView = $contentView ?? '';
     $activeMenu = $activeMenu ?? 'dashboard';
@@ -23,7 +23,7 @@
     <div class="admin-wrapper">
         <?php include __DIR__ . '/sidebar.php'; ?>
 
-        <div class="d-flex flex-column flex-grow-1">
+        <div class="admin-main d-flex flex-column flex-grow-1">
             <main class="admin-content">
                 <?php
                     if (!empty($contentView) && file_exists($contentView)) {
@@ -37,12 +37,10 @@
         </div>
     </div>
     
-    <!-- Các thư viện JS chung -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
-    <!-- Vòng lặp để nạp các file JS riêng của từng trang -->
     <?php
     $jsFiles = $jsFiles ?? [];
     foreach ($jsFiles as $jsFile):
