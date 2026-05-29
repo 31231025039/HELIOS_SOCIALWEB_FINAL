@@ -33,8 +33,31 @@ Việc phát triển dự án mạng xã hội HELIOS được xây dựng dựa
   
 ### Kiến thức và công nghệ áp dụng:
 Dự án áp dụng kiến thức lập trình web 3 tầng (MVC) và sử dụng các công cụ sau:
-
+Front-end
+HTML & CSS: Xây dựng cấu trúc và định dạng giao diện website.
+JavaScript: Tạo tương tác động và xử lý logic phía trình duyệt.
+Bootstrap: Hỗ trợ giao diện responsive trên nhiều thiết bị.
+Back-end
+PHP: Xử lý logic phía server, quản lý người dùng và kết nối cơ sở dữ liệu.
+MySQL: Lưu trữ dữ liệu người dùng, bài đăng, tuyển dụng và tương tác.
+XAMPP: Môi trường máy chủ cục bộ tích hợp Apache, PHP và MySQL.
+phpMyAdmin: Quản trị cơ sở dữ liệu.
+Thư viện & công nghệ bổ trợ
+PHPMailer: Gửi email xác nhận tài khoản và thông báo hệ thống.
 Các chức năng chính
+Dành cho Khách/Thành viên
+Đăng ký & Đăng nhập
+Người dùng có thể tạo tài khoản, đăng nhập và hỗ trợ quên mật khẩu.
+Quản lý hồ sơ cá nhân
+Cập nhật thông tin cá nhân, kỹ năng, học vấn, kinh nghiệm và ảnh đại diện.
+Đăng bài & Tương tác
+Đăng bài chia sẻ kiến thức, hình ảnh, cảm xúc; tương tác thông qua lượt thích, bình luận và chia sẻ.
+Kết nối cộng đồng
+Theo dõi, kết bạn hoặc tham gia các cộng đồng nghề nghiệp theo lĩnh vực quan tâm.
+Tìm kiếm việc làm & Ứng tuyển
+Tìm kiếm tin tuyển dụng theo vị trí, kỹ năng hoặc công ty; gửi CV và ứng tuyển trực tuyến.
+Nhắn tin
+Trao đổi và kết nối trực tiếp giữa các người dùng.
 
 ## Lời cảm ơn
 Nhóm xin gửi lời cảm ơn chân thành nhất đến TS. Đặng Ngọc Hoàng Thành, người đã tận tâm hướng dẫn và đồng hành cùng nhóm trong suốt quá trình thực hiện đề tài. Những kiến thức và kinh nghiệm tích lũy từ học phần đóng vai trò quan trọng giúp nhóm tạo nên một sản phẩm hoàn chỉnh. Bên cạnh đó, nhóm cũng trân trọng cảm ơn Đại học Kinh tế Thành phố Hồ Chí Minh (UEH) đã tạo điều kiện về cơ sở vật chất cũng như môi trường học tập thuận lợi để nhóm có thể học tập và nghiên cứu hiệu quả.
