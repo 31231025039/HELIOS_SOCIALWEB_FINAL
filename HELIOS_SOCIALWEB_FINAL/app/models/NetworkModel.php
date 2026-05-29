@@ -1,68 +1,81 @@
 <?php
-// app/models/NetworkModel.php
-class NetworkModel
+
+class NetworkModel extends Database
 {
-    private $db;
-    public function __construct()
-    {
-        try {
-            $this->db = new PDO(
-                "mysql:host=localhost;dbname=db_helios;charset=utf8mb4",
-                "root",
-                ""
-            );
-            $this->db->setAttribute(
-                PDO::ATTR_ERRMODE,
-                PDO::ERRMODE_EXCEPTION
-            );
-        } catch (PDOException $e) {
-            die("Lỗi kết nối: " . $e->getMessage());
-        }
+
+        public function getSidebarStats($userId) {
+        $stmt = $this->db->prepare("
+            SELECT COUNT(*) FROM KetNoi
+            WHERE TrangThai = 'accepted'
+            AND (MaNguoiGui = :uid OR MaNguoiNhan = :uid2)
+        ");
+        $stmt->execute([':uid' => $userId, ':uid2' => $userId]);
+        $connectionCount = (int) $stmt->fetchColumn();
+
+        return [
+            'connected' => $connectionCount,
+        ];
     }
-    /*
-    |--------------------------------------------------------------------------
-    | Gợi ý kết nối
-    |--------------------------------------------------------------------------
-    */
-    public function getSuggestedUsers($currentUserId, $limit = 12)
+
+    public function getSuggestedUsers($currentUserId, $keyword = '', $limit = 15)
     {
         $sql = "
-        SELECT
+        SELECT 
             nd.MaNguoiDung AS id,
             nd.HoTen AS name,
             nd.TieuDe AS bio,
             nd.AnhDaiDien AS img,
             nd.XacMinh AS verified,
-            'Có kết nối chung' AS sub,
-            'bg-light' AS banner
+            'Có thể bạn biết' AS sub,
+            'bg-light' AS banner,
+            kn.MaKetNoi AS connection_id,
+            kn.TrangThai AS rel_status,
+            kn.MaNguoiGui AS rel_sender_id,
+            kn.MaNguoiNhan AS rel_receiver_id
         FROM NguoiDung nd
-        WHERE nd.MaNguoiDung != :uid
-        LIMIT :limit
+        JOIN TaiKhoan tk ON nd.MaNguoiDung = tk.MaNguoiDung -- THÊM DÒNG NÀY: Kết nối bảng TaiKhoan
+        LEFT JOIN KetNoi kn ON (
+            (kn.MaNguoiGui = :uid AND kn.MaNguoiNhan = nd.MaNguoiDung)
+            OR 
+            (kn.MaNguoiNhan = :uid2 AND kn.MaNguoiGui = nd.MaNguoiDung)
+        )
+        WHERE nd.MaNguoiDung != :uid3
+        AND (
+            kn.MaKetNoi IS NULL
+            OR (kn.TrangThai = 'pending' AND kn.MaNguoiGui = :uid4)
+        )
+        AND tk.VaiTro = 'User'  -- SỬA DÒNG NÀY: Đổi nd thành tk
         ";
 
+        $params = [
+            ':uid'  => $currentUserId,
+            ':uid2' => $currentUserId,
+            ':uid3' => $currentUserId,
+            ':uid4' => $currentUserId
+        ];
+
+        if (!empty($keyword)) {
+            $sql .= " AND nd.HoTen LIKE :keyword";
+            $params[':keyword'] = "%{$keyword}%";
+        }
+
+        $sql .= " ORDER BY RAND() LIMIT :limit";
+
         $stmt = $this->db->prepare($sql);
-
-        $stmt->bindValue(':uid', $currentUserId);
-
-        $stmt->bindValue(
-            ':limit',
-            $limit,
-            PDO::PARAM_INT
-        );
-
+        
+        foreach ($params as $key => $val) {
+            $stmt->bindValue($key, $val);
+        }
+        $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
         $stmt->execute();
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-    /*
-    |--------------------------------------------------------------------------
-    | Danh sách lời mời
-    |--------------------------------------------------------------------------
-    */
+
     public function getPendingInvitations($userId)
     {
         $sql = "
-        SELECT
+        SELECT 
             kn.MaKetNoi AS connection_id,
             nd.MaNguoiDung AS id,
             nd.HoTen AS name,
@@ -70,23 +83,15 @@ class NetworkModel
             nd.AnhDaiDien AS img,
             nd.XacMinh AS verified
         FROM KetNoi kn
-        JOIN NguoiDung nd
-        ON kn.MaNguoiGui = nd.MaNguoiDung
-        WHERE kn.MaNguoiNhan = :uid
-        AND kn.TrangThai = 'pending'
+        JOIN NguoiDung nd ON kn.MaNguoiGui = nd.MaNguoiDung
+        WHERE kn.MaNguoiNhan = :uid AND kn.TrangThai = 'pending'
         ORDER BY kn.NgayTao DESC
         ";
         $stmt = $this->db->prepare($sql);
-        $stmt->execute([
-            ':uid' => $userId
-        ]);
+        $stmt->execute([':uid' => $userId]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-    /*
-    |--------------------------------------------------------------------------
-    | Danh sách kết nối
-    |--------------------------------------------------------------------------
-    */
+
     public function getConnections($userId)
     {
         $sql = "
@@ -97,118 +102,83 @@ class NetworkModel
             nd.AnhDaiDien AS img,
             nd.XacMinh AS verified
         FROM KetNoi kn
-        JOIN NguoiDung nd
-        ON (
-            (
-                kn.MaNguoiGui = :uid
-                AND nd.MaNguoiDung = kn.MaNguoiNhan
-            )
+        JOIN NguoiDung nd ON (
+            (kn.MaNguoiGui = :uid AND nd.MaNguoiDung = kn.MaNguoiNhan)
             OR
-            (
-                kn.MaNguoiNhan = :uid2
-                AND nd.MaNguoiDung = kn.MaNguoiGui
-            )
+            (kn.MaNguoiNhan = :uid2 AND nd.MaNguoiDung = kn.MaNguoiGui)
         )
         WHERE kn.TrangThai = 'accepted'
         ";
         $stmt = $this->db->prepare($sql);
         $stmt->execute([
-            ':uid' => $userId,
+            ':uid'  => $userId,
             ':uid2' => $userId
         ]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-    /*
-    |--------------------------------------------------------------------------
-    | Gửi lời mời kết nối
-    |--------------------------------------------------------------------------
-    */
+
     public function sendRequest($senderId, $receiverId)
     {
-        $checkSql = "
-        SELECT MaKetNoi
-        FROM KetNoi
-        WHERE
-        (
-            MaNguoiGui = :sender
-            AND MaNguoiNhan = :receiver
-        )
-        OR
-        (
-            MaNguoiGui = :receiver2
-            AND MaNguoiNhan = :sender2
-        )
-        ";
+        $checkSql = "SELECT MaKetNoi FROM KetNoi WHERE (MaNguoiGui = :s AND MaNguoiNhan = :r) OR (MaNguoiGui = :r2 AND MaNguoiNhan = :s2)";
         $checkStmt = $this->db->prepare($checkSql);
         $checkStmt->execute([
-            ':sender' => $senderId,
-            ':receiver' => $receiverId,
-            ':receiver2' => $receiverId,
-            ':sender2' => $senderId
+            ':s'  => $senderId, 
+            ':r'  => $receiverId, 
+            ':r2' => $receiverId, 
+            ':s2' => $senderId
         ]);
+        
         if ($checkStmt->fetch()) {
-            return false;
+            return false; 
         }
-        $sql = "
-        INSERT INTO KetNoi (
-            MaNguoiGui,
-            MaNguoiNhan,
-            TrangThai
-        )
-        VALUES (
-            :sender,
-            :receiver,
-            'pending'
-        )
-        ";
+
+        $sql = "INSERT INTO KetNoi (MaNguoiGui, MaNguoiNhan, TrangThai, NgayTao) VALUES (:sender, :receiver, 'pending', NOW())";
         $stmt = $this->db->prepare($sql);
         return $stmt->execute([
-            ':sender' => $senderId,
+            ':sender'   => $senderId, 
             ':receiver' => $receiverId
         ]);
     }
-    /*
-    |--------------------------------------------------------------------------
-    | Chấp nhận lời mời
-    |--------------------------------------------------------------------------
-    */
+
+    public function getConnectionById($connectionId)
+    {
+        $stmt = $this->db->prepare("SELECT * FROM KetNoi WHERE MaKetNoi = :id");
+        $stmt->execute([':id' => $connectionId]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function removeRequest($currentUserId, $targetUserId)
+    {
+        $sql = "DELETE FROM KetNoi WHERE (MaNguoiGui = :uid AND MaNguoiNhan = :tuid) OR (MaNguoiGui = :tuid2 AND MaNguoiNhan = :uid2)";
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute([
+            ':uid'   => $currentUserId, 
+            ':tuid'  => $targetUserId,
+            ':tuid2' => $targetUserId, 
+            ':uid2'  => $currentUserId
+        ]);
+    }
+
     public function acceptRequest($connectionId, $userId)
     {
-        $sql = "
-        UPDATE KetNoi
-        SET TrangThai = 'accepted'
-        WHERE MaKetNoi = :id
-        AND MaNguoiNhan = :uid
-        ";
+        $sql = "UPDATE KetNoi SET TrangThai = 'accepted' WHERE MaKetNoi = :id AND MaNguoiNhan = :uid";
         $stmt = $this->db->prepare($sql);
         return $stmt->execute([
-            ':id' => $connectionId,
+            ':id'  => $connectionId, 
             ':uid' => $userId
         ]);
     }
-    /*
-    |--------------------------------------------------------------------------
-    | Bỏ qua lời mời
-    |--------------------------------------------------------------------------
-    */
+
     public function ignoreRequest($connectionId, $userId)
     {
-        $sql = "
-        DELETE FROM KetNoi
-        WHERE MaKetNoi = :id
-        AND MaNguoiNhan = :uid
-        ";
+        $sql = "DELETE FROM KetNoi WHERE MaKetNoi = :id AND MaNguoiNhan = :uid";
         $stmt = $this->db->prepare($sql);
         return $stmt->execute([
-            ':id' => $connectionId,
+            ':id'  => $connectionId, 
             ':uid' => $userId
         ]);
     }
-    /*
-    |--------------------------------------------------------------------------
-    | Search user
-    |--------------------------------------------------------------------------
-    */
+
     public function searchUsers($keyword)
     {
         $sql = "
@@ -229,3 +199,4 @@ class NetworkModel
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }
+?>
