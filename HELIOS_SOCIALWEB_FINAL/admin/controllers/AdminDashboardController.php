@@ -10,7 +10,6 @@ class AdminDashboardController {
     }
 
     public function index() {
-        // Cho phép giá trị '0' (Cả năm) cho tháng
         $selectedMonth = (int) ($_GET['month'] ?? date('n'));
         $selectedYear = (int) ($_GET['year'] ?? date('Y'));
 
