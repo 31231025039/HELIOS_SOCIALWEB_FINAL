@@ -1,5 +1,5 @@
 <?php
-// File: admin/controllers/AdminJobController.php (Đã cập nhật để dùng AJAX)
+// File: admin/controllers/AdminJobController.php 
 
 class AdminJobController {
     
@@ -9,14 +9,12 @@ class AdminJobController {
         $this->jobModel = new AdminJobModel();
     }
 
-    // Hàm helper để trả về JSON
     private function jsonResponse($success, $message = '') {
         header('Content-Type: application/json');
         echo json_encode(['success' => $success, 'message' => $message]);
         exit();
     }
 
-    // Hàm index() giữ nguyên, chỉ cần đảm bảo có $jsFiles
     public function index() {
         $searchTerm = $_GET['search'] ?? '';
         $jobs = !empty($searchTerm) 
@@ -28,7 +26,7 @@ class AdminJobController {
         
         $pageTitle = "Quản lý tuyển dụng";
         $activeMenu = "jobs";
-        $jsFiles = ['admin-jobs.js']; // Đảm bảo file JS được nạp
+        $jsFiles = ['admin-jobs.js'];
         $contentView = VIEW_PATH_ADMIN . '/jobs.php';
         
         include VIEW_PATH_ADMIN . '/layouts/main.php';
