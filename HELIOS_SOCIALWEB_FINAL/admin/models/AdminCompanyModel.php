@@ -37,10 +37,9 @@ class AdminCompanyModel extends Database {
         return $stmt->execute([$maCongTy]);
     }
     
-    // Hàm xử lý upload file logo (tương tự như hàm upload ảnh profile)
     public function uploadLogo($file) {
         if (!isset($file) || $file['error'] != 0) {
-            return ['success' => false]; // Không có file hoặc có lỗi
+            return ['success' => false]; 
         }
         
         $targetDir = ROOT_PATH . "/public/uploads/logos/";
@@ -66,10 +65,7 @@ class AdminCompanyModel extends Database {
      * @return array Danh sách các công ty khớp với từ khóa.
      */
     public function searchCompanies($keyword) {
-        // Chuẩn bị từ khóa với ký tự đại diện '%'
         $searchTerm = '%' . $keyword . '%';
-        
-        // Tìm kiếm trong cột TenCongTy
         $sql = "SELECT * FROM congty WHERE TenCongTy LIKE ? ORDER BY MaCongTy DESC";
         
         $stmt = $this->db->prepare($sql);
