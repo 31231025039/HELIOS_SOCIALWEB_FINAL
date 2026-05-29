@@ -2,10 +2,14 @@
 class UserModel extends Database {
     // 1. Hàm lấy thông tin user
     public function getUser($id) {
-        $stmt = $this->db->prepare("SELECT * FROM NguoiDung WHERE MaNguoiDung = :id");
+        $sql = "SELECT nd.*, tk.Email, tk.VaiTro 
+                FROM NguoiDung nd
+                JOIN TaiKhoan tk ON nd.MaNguoiDung = tk.MaNguoiDung
+                WHERE nd.MaNguoiDung = :id";
+        $stmt = $this->db->prepare($sql);
         $stmt->bindParam(':id', $id);
         $stmt->execute();
-        return $stmt->fetch(PDO::FETCH_ASSOC); 
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
     // 2. Hàm cập nhật thông tin cá nhân (Tên, Tiêu đề, Địa điểm)
@@ -158,7 +162,7 @@ class UserModel extends Database {
         return $stmt->execute();
     }
 
-    // HÀM MỚI: Xử lý upload file
+    // Xử lý upload file
     public function uploadFile($file) {
         $targetDir = ROOT_PATH . "/public/uploads/profiles/";
         if (!file_exists($targetDir)) {
@@ -189,6 +193,100 @@ class UserModel extends Database {
         } else {
             return ['success' => false, 'message' => 'Đã có lỗi xảy ra khi tải file lên.'];
         }
+    }
+
+    public function findUserByEmail($email) {
+        $stmt = $this->db->prepare("SELECT * FROM TaiKhoan WHERE Email = :email");
+        $stmt->execute([':email' => $email]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function findUserByToken($token) {
+        $stmt = $this->db->prepare("SELECT * FROM TaiKhoan WHERE VerificationToken = :token");
+        $stmt->execute([':token' => $token]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function createUser($name, $email, $hashedPassword, $token, $tokenExpires, $role = 'User') {
+        $this->db->beginTransaction();
+        try {
+            // 1. Tạo bản ghi trong NguoiDung (Chỉ chứa Họ Tên)
+            $stmt1 = $this->db->prepare(
+                "INSERT INTO NguoiDung (HoTen) VALUES (:name)"
+            );
+            $stmt1->execute([':name' => $name]);
+            
+            // Lấy ID người dùng vừa tạo
+            $userId = $this->db->lastInsertId();
+
+            // 2. Tạo bản ghi trong TaiKhoan (Chứa Email, Mật Khẩu, Vai trò, Token...)
+            $stmt2 = $this->db->prepare(
+                "INSERT INTO TaiKhoan (MaNguoiDung, Email, MatKhau, VaiTro, VerificationToken, TokenExpiresAt)
+                 VALUES (:userId, :email, :password, :role, :token, :expires)"
+            );
+            $stmt2->execute([
+                ':userId' => $userId,
+                ':email' => $email,
+                ':password' => $hashedPassword,
+                ':role' => $role,
+                ':token' => $token,
+                ':expires' => $tokenExpires
+            ]);
+
+            $this->db->commit();
+            return $userId;
+        } catch (Exception $e) {
+            $this->db->rollBack();
+            error_log('UserModel::createUser error: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function activateUser($accountId) {
+        $stmt = $this->db->prepare(
+            "UPDATE TaiKhoan
+             SET TrangThai = 'active', VerificationToken = NULL, TokenExpiresAt = NULL
+             WHERE MaTaiKhoan = :accountId"
+        );
+        return $stmt->execute([':accountId' => $accountId]);
+    }
+
+    public function updatePasswordResetToken($email, $token, $expiresAt) {
+        $stmt = $this->db->prepare(
+            "UPDATE TaiKhoan SET PasswordResetToken = :token, ResetTokenExpiresAt = :expires WHERE Email = :email"
+        );
+        return $stmt->execute([
+            ':token' => $token,
+            ':expires' => $expiresAt,
+            ':email' => $email
+        ]);
+    }
+
+    public function findUserByResetToken($token) {
+        $stmt = $this->db->prepare("SELECT * FROM TaiKhoan WHERE PasswordResetToken = :token");
+        $stmt->execute([':token' => $token]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function updatePassword($accountId, $hashedPassword) {
+        $stmt = $this->db->prepare(
+            "UPDATE TaiKhoan 
+             SET MatKhau = :password, PasswordResetToken = NULL, ResetTokenExpiresAt = NULL 
+             WHERE MaTaiKhoan = :accountId"
+        );
+        return $stmt->execute([
+            ':password' => $hashedPassword,
+            ':accountId' => $accountId
+        ]);
+    }
+    /**
+     * Kiểm tra trạng thái kết nối giữa 2 người dùng
+     */
+    public function checkConnectionStatus($userId1, $userId2) {
+        $sql = "SELECT TrangThai FROM KetNoi WHERE (MaNguoiGui = :u1 AND MaNguoiNhan = :u2) OR (MaNguoiGui = :u3 AND MaNguoiNhan = :u4)";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':u1' => $userId1, ':u2' => $userId2, ':u3' => $userId2, ':u4' => $userId1]);
+        return $stmt->fetchColumn();
     }
 } 
 ?>
