@@ -7,10 +7,6 @@ class AboutMeController {
      */
     private $loggedInUserId;
 
-    /**
-     * Hàm dựng: Tự động chạy khi HomeController được tạo.
-     * Lấy ID người dùng từ session và lưu vào thuộc tính của lớp.
-     */
     public function __construct() {
         // Lấy ID người dùng MỘT LẦN DUY NHẤT và lưu lại
         $this->loggedInUserId = $_SESSION['user_id'] ?? null;
@@ -36,7 +32,6 @@ class AboutMeController {
             exit;
         }
 
-        // --- ĐOẠN MỚI THÊM VÀO: Lấy trạng thái kết nối nếu đang xem trang người khác ---
         $relStatus = null;
         if (!$isOwnProfile) {
             $relStatus = $userModel->checkConnectionStatus($userId, $targetUserId);
@@ -63,7 +58,7 @@ class AboutMeController {
         exit();
     }
 
-    // 2. Cập nhật thông tin cá nhân (đã chuyển sang JSON)
+    // 2. Cập nhật thông tin cá nhân 
     public function update() {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $userModel = new UserModel();
@@ -82,7 +77,7 @@ class AboutMeController {
         }
     }
 
-    // 4. Thêm kinh nghiệm (đã sửa lỗi thiếu tham số)
+    // 4. Thêm kinh nghiệm 
     public function addExperience() {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $denNgay = !empty($_POST['denngay']) ? $_POST['denngay'] : NULL;
@@ -102,7 +97,7 @@ class AboutMeController {
         }
     }
 
-    // 6. Thêm học vấn (đã chuyển sang JSON)
+    // 6. Thêm học vấn 
     public function addEducation() {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $denNgay = !empty($_POST['denngay']) ? $_POST['denngay'] : NULL;
@@ -112,7 +107,7 @@ class AboutMeController {
         }
     }
 
-    // 7. Sửa học vấn (đã chuyển sang JSON)
+    // 7. Sửa học vấn 
     public function editEducation() {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $denNgay = !empty($_POST['denngay']) ? $_POST['denngay'] : NULL;
@@ -122,17 +117,41 @@ class AboutMeController {
         }
     }
 
-    // 8. Thêm kỹ năng (đã chuyển sang JSON)
+    // 8. Thêm kỹ năng 
     public function addSkill() {
+        header('Content-Type: application/json');
+        
+        $userId = $this->loggedInUserId; 
+        
         if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['makynang'])) {
             $userModel = new UserModel();
-            $success = $userModel->addUserSkill($this->loggedInUserId, $_POST['makynang']);
-            $this->jsonResponse($success);
+            $skillsArray = $_POST['makynang']; 
+
+            if (!is_array($skillsArray)) {
+                $skillsArray = [$skillsArray]; 
+            }
+
+            $success = true;
+            foreach ($skillsArray as $skillId) {
+                $result = $userModel->addUserSkill($userId, $skillId);
+                if (!$result) {
+                    $success = false; 
+                }
+            }
+
+            if ($success) {
+                echo json_encode(['success' => true, 'message' => 'Thêm kỹ năng thành công!']);
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Một số kỹ năng bị lỗi không thể thêm.']);
+            }
+            exit();
         }
-        $this->jsonResponse(false, 'Chưa chọn kỹ năng.');
+
+        echo json_encode(['success' => false, 'message' => 'Chưa chọn kỹ năng.']);
+        exit();
     }
 
-    // 9. Xóa kỹ năng (đã chuyển sang JSON)
+    // 9. Xóa kỹ năng 
     public function deleteSkill() {
         if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['makynang'])) {
             $userModel = new UserModel();
@@ -142,12 +161,11 @@ class AboutMeController {
         $this->jsonResponse(false, 'Không tìm thấy kỹ năng để xóa.');
     }
 
-    // 10. Cập nhật ảnh đại diện/ảnh bìa (giữ nguyên)
+    // 10. Cập nhật ảnh đại diện/ảnh bìa 
     // Cập nhật ảnh đại diện/ảnh bìa
     public function updateImage() {
         header('Content-Type: application/json');
         
-        // 1. Lấy ID người dùng đang đăng nhập
         $userId = $this->loggedInUserId;
         if (!$userId) {
             echo json_encode(['success' => false, 'message' => 'Vui lòng đăng nhập lại.']);
@@ -165,13 +183,11 @@ class AboutMeController {
             if (isset($_FILES['image_file']) && $_FILES['image_file']['error'] == 0) {
                 $userModel = new UserModel();
                 
-                // Gọi hàm upload file có sẵn trong UserModel
                 $result = $userModel->uploadFile($_FILES['image_file']);
                 
                 if ($result['success']) {
                     $filePath = $result['filePath'];
                     
-                    // 2. Cập nhật vào DB với đúng $userId
                     $updateSuccess = $userModel->updateUserImage($userId, $imageType, $filePath);
                     
                     if ($updateSuccess) {
@@ -181,7 +197,6 @@ class AboutMeController {
                             'filePath' => $filePath
                         ]);
                     } else {
-                        // Xóa file vật lý nếu lưu DB thất bại
                         @unlink(ROOT_PATH . '/public' . $filePath); 
                         echo json_encode(['success' => false, 'message' => 'Lỗi cập nhật Cơ sở dữ liệu.']);
                     }
