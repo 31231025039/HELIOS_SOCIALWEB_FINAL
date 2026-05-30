@@ -14,7 +14,7 @@
                 <input type="text" class="form-control" name="search" placeholder="Tìm kiếm theo tiêu đề hoặc công ty..." value="<?php echo htmlspecialchars($searchTerm ?? ''); ?>">
                 <button class="btn btn-primary" type="submit"><i class="bi bi-search"></i> Tìm kiếm</button>
                 <?php if (!empty($searchTerm)): ?>
-                    <a href="/helios/public/admin/companies" class="btn btn-outline-secondary">Xóa</a>
+                    <a href="/helios/public/admin/jobs" class="btn btn-outline-secondary">Xóa</a>
                 <?php endif; ?>
             </div>
         </form>
@@ -64,7 +64,7 @@
 </div>
 
 <?php
-// === Định nghĩa Form Fields dùng chung (ĐÃ CẬP NHẬT) ===
+// === Định nghĩa Form Fields dùng chung ===
 function renderJobFormFields($companies = [], $skills = []) {
     $html = '
         <div class="row">
