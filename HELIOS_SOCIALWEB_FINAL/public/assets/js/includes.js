@@ -70,7 +70,60 @@
             });
     return chain.finally(function () {
       document.dispatchEvent(new CustomEvent("helios:partials-loaded"));
+      // Sau khi partial xong thì bắt đầu check badge
+      startUnreadBadge();
     });
+  }
+
+  // ── BADGE TIN NHẮN CHƯA ĐỌC ──────────────────────────────
+  // Chạy trên mọi trang, poll mỗi 10s, cập nhật #msgNavBadge
+  var badgeTimer = null;
+
+  function startUnreadBadge() {
+    // Nếu đang ở trang message thì message.js tự lo (poll 3s),
+    // includes.js không cần poll nặng — nhưng vẫn chạy để đồng bộ
+    checkUnreadBadge();
+    if (badgeTimer) clearInterval(badgeTimer);
+    badgeTimer = setInterval(checkUnreadBadge, 10000);
+  }
+
+  function checkUnreadBadge() {
+    checkNotificationBadge();
+    var badge = document.getElementById("msgNavBadge");
+    if (!badge) return; // navbar chưa render hoặc không tồn tại
+
+    fetch(BASE + "message/unread-count", { credentials: "same-origin" })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (data) {
+        if (!data) return;
+        var count = parseInt(data.unread) || 0;
+        if (count > 0) {
+          badge.textContent   = count > 99 ? "99+" : count;
+          badge.style.display = "";
+        } else {
+          badge.style.display = "none";
+        }
+      })
+      .catch(function () { /* mạng lỗi thì im lặng */ });
+  }
+
+  function checkNotificationBadge() {
+    var badge = document.getElementById("notiBadge");
+    if (!badge) return;
+
+    fetch(BASE + "noti/unread-count", { credentials: "same-origin" })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (data) {
+        if (!data) return;
+        var count = parseInt(data.count) || 0;
+        if (count > 0) {
+          badge.textContent = count > 99 ? "99+" : count;
+          badge.style.display = "";
+        } else {
+          badge.style.display = "none";
+        }
+      })
+      .catch(function () {});
   }
 
   injectCommonCss();
