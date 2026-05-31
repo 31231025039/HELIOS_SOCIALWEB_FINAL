@@ -30,7 +30,7 @@ $viewerInitials = strtoupper($viewerInitials ?: '??');
 </div>
 
 <div class="modal fade" id="composeModal" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered modal-lg">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
     <div class="modal-content">
       <div class="modal-header border-0 pb-0">
         <h5 class="modal-title fw-bold">Tạo bài viết</h5>
