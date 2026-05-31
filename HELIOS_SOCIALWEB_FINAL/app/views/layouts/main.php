@@ -36,7 +36,7 @@ $baseUrl = '/helios/public/';
 
 <?php
 // Bao gồm Navbar
-include VIEW_PATH . '/layouts/navbar.php';
+include VIEW_PATH_APP . '/layouts/navbar.php';
 ?>
 
 <div class="app-content">
@@ -52,7 +52,7 @@ include VIEW_PATH . '/layouts/navbar.php';
 
 <?php
 // Bao gồm Footer
-include VIEW_PATH . '/layouts/footer.php';
+include VIEW_PATH_APP . '/layouts/footer.php';
 ?>
 
 <!-- Bootstrap JS Bundle -->
