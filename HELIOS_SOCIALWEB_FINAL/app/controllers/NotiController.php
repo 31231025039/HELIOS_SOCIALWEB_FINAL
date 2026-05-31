@@ -19,6 +19,7 @@ class NotiController {
         $jsFiles = ['noti.js'];
 
         $networkModel = new NetworkModel();
+        $networkStats = $networkModel->getSidebarStats($this->loggedInUserId);
         $upcomingEvents = (new PostModel())->getUpcomingEvents();
 
         $notiModel = new NotiModel();
