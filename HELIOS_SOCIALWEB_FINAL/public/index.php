@@ -1,26 +1,39 @@
 <?php
+// File: public/index.php
+
+// Tự động nạp các thư viện từ Composer
+require_once dirname(__DIR__) . '/vendor/autoload.php';
+
+// Luôn khởi động session ở đầu tiên
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 // 1. CẤU HÌNH CƠ BẢN
 define('ROOT_PATH', dirname(__DIR__));
 define('APP_PATH', ROOT_PATH . '/app');
 define('ADMIN_PATH', ROOT_PATH . '/admin');
 define('JOBS_PER_PAGE', 4);
-
-// Đường dẫn tới thư mục Views (chung cho cả app và admin)
 define('VIEW_PATH_APP', APP_PATH . '/views');
 define('VIEW_PATH_ADMIN', ADMIN_PATH . '/views');
 
 $baseUrl = '/helios/public/';
 
+// Tạo URL base đầy đủ để dùng trong các link tuyệt đối (như email)
+$protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http";
+$host = $_SERVER['HTTP_HOST'];
+$fullBaseUrl = $protocol . '://' . $host . $baseUrl;
+
+
 // AUTOLOADER NÂNG CẤP
 spl_autoload_register(function ($class) {
     $paths = [
-        ROOT_PATH . '/config/' . $class . '.php',      // Thư mục config
-        APP_PATH . '/controllers/' . $class . '.php', // Controller của App
-        APP_PATH . '/models/' . $class . '.php',      // Model của App
-        ADMIN_PATH . '/controllers/' . $class . '.php', // Controller của Admin
-        ADMIN_PATH . '/models/' . $class . '.php',      // Model của Admin
+        ROOT_PATH . '/config/' . $class . '.php',
+        APP_PATH . '/controllers/' . $class . '.php',
+        APP_PATH . '/models/' . $class . '.php',
+        ADMIN_PATH . '/controllers/' . $class . '.php',
+        ADMIN_PATH . '/models/' . $class . '.php',
     ];
-
     foreach ($paths as $path) {
         if (file_exists($path)) {
             require_once $path;
@@ -36,10 +49,38 @@ if (strpos($request_uri, $baseUrl) === 0) {
 }
 $request_uri = trim($request_uri, '/');
 
+
 // ==========================================================
-// 3. DANH SÁCH ĐƯỜNG DẪN (ROUTING TỔNG HỢP BẰNG MẢNG)
+// 3. ROUTING VÀ BẢO VỆ
 // ==========================================================
-// Cấu trúc: 'đường/dẫn' => ['TênController', 'tên_hàm']
+
+// Danh sách các route công khai không yêu cầu đăng nhập
+$publicRoutes = [
+    'login',
+    'register',
+    'verify-email',
+    'forgot-password', 
+    'reset-password',  
+];
+
+// ----- BẢO VỆ TOÀN CỤC -----
+$isLoggedIn = isset($_SESSION['user_id']);
+$isPublicRoute = in_array($request_uri, $publicRoutes);
+
+if (!$isLoggedIn && !$isPublicRoute) {
+    header('Location: ' . $baseUrl . 'login');
+    exit();
+}
+
+// ----- BẢO VỆ TRANG ADMIN -----
+if (strpos($request_uri, 'admin') === 0) {
+    if (!$isLoggedIn || !isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'Admin') {
+        http_response_code(403);
+        die('Access Denied: You do not have permission to access this page.');
+    }
+}
+
+// DANH SÁCH ĐƯỜNG DẪN
 $routes = [
     /*
     |--------------------------------------------------------------------------
@@ -58,6 +99,7 @@ $routes = [
     'home/add-comment'         => ['HomeController', 'addComment'],
     'home/delete-comment'      => ['HomeController', 'deleteComment'],
     'home/update-comment'      => ['HomeController', 'updateComment'],
+    'home/hide-comment'        => ['HomeController', 'hideComment'],
     'home/add-post-images'     => ['HomeController', 'addPostImages'],
     'home/delete-post-image'   => ['HomeController', 'deletePostImage'],
     /*
@@ -85,7 +127,9 @@ $routes = [
     'network/send-request'     => ['NetworkController', 'sendRequest'],
     'network/accept-request'   => ['NetworkController', 'acceptRequest'],
     'network/ignore-request'   => ['NetworkController', 'ignoreRequest'],
+    'network/remove-connection' => ['NetworkController', 'removeConnection'],
     'network/search'           => ['NetworkController', 'search'],
+    'network/get-profile'    => ['NetworkController', 'getQuickProfile'],
     /*
     |--------------------------------------------------------------------------
     | JOB
@@ -114,11 +158,15 @@ $routes = [
     | NOTI
     |--------------------------------------------------------------------------
     */
+    // Thông báo
     'noti'                     => ['NotiController', 'index'],
     'noti/mark-read'           => ['NotiController', 'markRead'],
     'noti/mark-all-read'       => ['NotiController', 'markAllRead'],
     'noti/delete'              => ['NotiController', 'deleteNoti'],
-    
+    'noti/filter'              => ['NotiController', 'filter'],
+    'noti/unread-count'        => ['NotiController', 'getUnreadCount'],
+    'noti/toggle-notifications'=> ['NotiController', 'toggleNotifications'],
+        
     /*
     |--------------------------------------------------------------------------
     | ADMIN
@@ -126,7 +174,14 @@ $routes = [
     */
     'admin' => ['AdminDashboardController', 'index'],
     'admin/dashboard' => ['AdminDashboardController', 'index'],
+    // USERS
+    'admin/users'               => ['AdminUserController','index'],
+    'admin/users/get-users'     => ['AdminUserController','getUsers'],
+    'admin/users/get-detail'    => ['AdminUserController','getDetail'],
+    'admin/users/create'        => ['AdminUserController','create'],
+    'admin/users/toggle-status' => ['AdminUserController','toggleStatus'], 
 
+     // JOBS & COMPANIES
     'admin/jobs' => ['AdminJobController', 'index'],
     'admin/jobs/create' => ['AdminJobController', 'create'],
     'admin/jobs/update' => ['AdminJobController', 'update'],
@@ -136,7 +191,8 @@ $routes = [
     'admin/companies/create' => ['AdminCompanyController', 'create'],
     'admin/companies/update' => ['AdminCompanyController', 'update'],
     'admin/companies/delete' => ['AdminCompanyController', 'delete'],
-
+    
+    // POSTS    
     'admin/posts'                  => ['AdminPostController', 'index'],
     'admin/posts/detail'           => ['AdminPostController', 'detail'],
     'admin/posts/get-posts'        => ['AdminPostController', 'getPosts'],
@@ -144,30 +200,34 @@ $routes = [
     'admin/posts/create'           => ['AdminPostController', 'create'],
     'admin/posts/delete'           => ['AdminPostController', 'delete'],
     'admin/posts/update'           => ['AdminPostController', 'update'],
+    'admin/posts/upload-images' => ['AdminPostController', 'uploadImages'],
+    /*
+    |--------------------------------------------------------------------------
+    | AUTHENTICATION
+    |--------------------------------------------------------------------------
+    */
+    'register' => ['AuthController', 'handleRegister'],
+    'verify-email' => ['AuthController', 'verifyEmail'],
+    'login' => ['AuthController', 'handleLogin'],
+    'logout' => ['AuthController', 'logout'],
+    'forgot-password' => ['AuthController', 'handleForgotPassword'],
+    'reset-password' => ['AuthController', 'handleResetPassword'],
 ];
 // ==========================================================
 // 4. BỘ ĐIỀU HƯỚNG (DISPATCHER)
 // ==========================================================
-// Kiểm tra xem URL người dùng gõ có nằm trong danh sách Mảng ở trên không?
 if (array_key_exists($request_uri, $routes)) {
-    // Lấy tên Controller và tên Hàm từ mảng ra
     $controllerName = $routes[$request_uri][0];
-    $methodName     = $routes[$request_uri][1];
-    // Khởi tạo Controller và Gọi hàm tương ứng
+    $methodName = $routes[$request_uri][1];
     $controller = new $controllerName();
     $controller->$methodName();
 } else {
-    // NẾU TÌM KHÔNG THẤY TRONG MẢNG -> BÁO LỖI 404
     http_response_code(404);
     $pageTitle = "404 Not Found";
-
-    // Kiểm tra xem URL có bắt đầu bằng 'admin/' không
     if (strpos($request_uri, 'admin/') === 0) {
-        // Nếu là trang admin, nạp file 404.php và layout của admin
         $contentView = VIEW_PATH_ADMIN . '/404.php';
         include VIEW_PATH_ADMIN . '/layouts/main.php';
     } else {
-        // Nếu là trang người dùng, nạp file 404.php và layout của app
         $contentView = VIEW_PATH_APP . '/404.php';
         include VIEW_PATH_APP . '/layouts/main.php';
     }
