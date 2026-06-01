@@ -18,10 +18,20 @@
 .job-logo img { width: 100%; height: 100%; object-fit: contain; padding: 5px; }
 
 .job-title { font-size: 22px; font-weight: 700; color: #062b6b; line-height: 1.45; margin-bottom: 12px; margin-top: 0; }
-.job-meta { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
-.company-name { display: flex; align-items: center; gap: 5px; font-size: 14px; font-weight: 600; color: #333; }
-.meta-item { display: flex; align-items: center; gap: 5px; font-size: 13.5px; color: #555; }
-.meta-expire { color: #e67e22; font-weight: 600;}
+.job-meta { display: flex; flex-wrap: wrap; gap: 7px; align-items: center; }
+
+.meta-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 12px; border-radius: 20px;
+  font-size: 13px; font-weight: 400; white-space: nowrap;
+}
+.meta-pill svg { flex-shrink: 0; }
+
+.pill-company  { background: #EAF3DE; color: #3B6D11; border: 0.5px solid #97C459; }
+.pill-location { background: #E6F1FB; color: #185FA5; border: 0.5px solid #85B7EB; }
+.pill-deadline { background: #FAEEDA; color: #854F0B; border: 0.5px solid #EF9F27; }
+.pill-salary   { background: #EAF3DE; color: #3B6D11; border: 0.5px solid #639922; }
+.pill-deadline.expired { background: #FCEBEB; color: #A32D2D; border-color: #F09595; }
 
 /* TABS */
 .tabs {
@@ -73,4 +83,19 @@
   .job-header-top { flex-direction: column; }
   .job-logo { width: 80px; height: 70px; }
   .info-grid { flex-direction: column; }
+}
+
+/* SALARY ROW IN HEADER */
+.job-salary-row { margin-top: 12px; }
+.job-salary-row .info-item { flex: unset; }
+
+/* SKILL TAGS */
+.job-skills-card { padding-bottom: 20px; }
+.skills-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+.skill-tag {
+  display: inline-flex; align-items: center;
+  background: #f0fdf4; color: #16a34a;
+  border: 1.5px solid #bbf7d0;
+  border-radius: 20px; padding: 4px 14px;
+  font-size: 13.5px; font-weight: 500;
 }
