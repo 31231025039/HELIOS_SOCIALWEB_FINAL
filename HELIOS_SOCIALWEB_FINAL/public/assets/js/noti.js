@@ -1,98 +1,145 @@
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
+    const tabBtns = document.querySelectorAll('#notiTab button');
+    const notiContainer = document.getElementById('notiListContainer');
 
-    // 1. ĐÁNH DẤU 1 THÔNG BÁO LÀ ĐÃ ĐỌC
-    document.querySelectorAll('.btn-mark-read').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            e.stopPropagation();
-            
-            let notiItem = this.closest('.noti-item');
-            let notiId = notiItem.getAttribute('data-noti-id');
-
-            let formData = new FormData();
-            formData.append('noti_id', notiId);
-
-            fetch('/helios/public/noti/mark-read', { method: 'POST', body: formData })
+    function loadNotifications(filter) {
+        fetch('/helios/public/noti/filter?filter=' + filter)
             .then(res => res.json())
             .then(data => {
-                if (data.success) {
-                    // Update UI: Xóa nền xanh, xóa chấm xanh, xóa nút check
-                    notiItem.classList.remove('unread');
-                    let dot = notiItem.querySelector('.noti-unread-dot');
-                    if (dot) dot.remove();
-                    this.remove(); 
-                    
-                    updateBadgeCount(); // Giảm số lượng đỏ trên Header
+                if (data.html) {
+                    notiContainer.innerHTML = data.html;
+                    attachEventHandlers();
                 }
-            });
+            })
+            .catch(err => console.error('Lỗi tải thông báo:', err));
+    }
+
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', function () {
+            tabBtns.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            loadNotifications(this.getAttribute('data-filter'));
         });
     });
 
-    // 2. XÓA 1 THÔNG BÁO
-    document.querySelectorAll('.btn-delete-noti').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            e.stopPropagation();
-            if (!confirm("Xóa thông báo này?")) return;
-
-            let notiItem = this.closest('.noti-item');
-            let notiId = notiItem.getAttribute('data-noti-id');
-
-            let formData = new FormData();
-            formData.append('noti_id', notiId);
-
-            fetch('/helios/public/noti/delete', { method: 'POST', body: formData })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    // Hiệu ứng mờ dần rồi xóa khỏi màn hình
-                    notiItem.style.transition = 'opacity 0.3s';
-                    notiItem.style.opacity = '0';
-                    setTimeout(() => {
-                        if (notiItem.classList.contains('unread')) updateBadgeCount();
-                        notiItem.remove();
-                    }, 300);
-                }
+    function attachEventHandlers() {
+        document.querySelectorAll('.noti-item').forEach(item => {
+            item.addEventListener('click', function () {
+                const link = this.getAttribute('data-link');
+                if (link) window.location.href = link;
             });
         });
-    });
 
-    // 3. ĐÁNH DẤU TẤT CẢ LÀ ĐÃ ĐỌC
-    const btnMarkAll = document.getElementById('btnMarkAllRead');
-    if (btnMarkAll) {
-        btnMarkAll.addEventListener('click', function(e) {
-            e.preventDefault();
+        document.querySelectorAll('.btn-mark-read').forEach(btn => {
+            btn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                const notiItem = this.closest('.noti-item');
+                const notiId = notiItem.getAttribute('data-noti-id');
+                const fd = new FormData();
+                fd.append('noti_id', notiId);
 
-            fetch('/helios/public/noti/mark-all-read', { method: 'POST' })
+                fetch('/helios/public/noti/mark-read', { method: 'POST', body: fd })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            notiItem.classList.remove('bg-light');
+                            this.remove();
+                            updateUnreadCount();
+                        }
+                    })
+                    .catch(err => console.error('Lỗi đánh dấu đã đọc:', err));
+            });
+        });
+
+        document.querySelectorAll('.btn-delete-noti').forEach(btn => {
+            btn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                if (!confirm('Xóa thông báo này?')) return;
+
+                const notiItem = this.closest('.noti-item');
+                const notiId = notiItem.getAttribute('data-noti-id');
+                const fd = new FormData();
+                fd.append('noti_id', notiId);
+
+                fetch('/helios/public/noti/delete', { method: 'POST', body: fd })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            notiItem.remove();
+                            if (notiContainer.querySelectorAll('.noti-item').length === 0) {
+                                notiContainer.innerHTML = '<div class="noti-empty text-center text-muted py-4"><i class="bi bi-inbox fs-1 d-block mb-2"></i><p class="mb-0">Không có thông báo nào.</p></div>';
+                            }
+                            updateUnreadCount();
+                        }
+                    })
+                    .catch(err => console.error('Lỗi xóa thông báo:', err));
+            });
+        });
+    }
+
+    document.getElementById('btnMarkAllRead')?.addEventListener('click', function () {
+        fetch('/helios/public/noti/mark-all-read', { method: 'POST' })
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
-                    // Xóa class unread ở mọi item
-                    document.querySelectorAll('.noti-item.unread').forEach(item => {
-                        item.classList.remove('unread');
-                        let dot = item.querySelector('.noti-unread-dot');
-                        if (dot) dot.remove();
-                        let btnRead = item.querySelector('.btn-mark-read');
-                        if (btnRead) btnRead.remove();
+                    document.querySelectorAll('.noti-item.bg-light').forEach(item => {
+                        item.classList.remove('bg-light');
+                        const btn = item.querySelector('.btn-mark-read');
+                        if (btn) btn.remove();
                     });
-                    // Tắt luôn badge đỏ
-                    let badge = document.querySelector('.noti-badge-new');
-                    if (badge) badge.remove();
+                    updateUnreadCount();
                 }
-            });
+            })
+            .catch(err => console.error('Lỗi đánh dấu tất cả đã đọc:', err));
+    });
+
+    const toggleBtn = document.getElementById('toggleNotifBtn');
+    if (toggleBtn) {
+        toggleBtn.addEventListener('click', function () {
+            const current = this.getAttribute('data-state') === '1' ? 1 : 0;
+            const newState = current === 1 ? 0 : 1;
+
+            fetch('/helios/public/noti/toggle-notifications', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'state=' + newState
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        this.setAttribute('data-state', newState);
+                        this.innerHTML = newState === 1 ? '<i class="bi bi-bell"></i>' : '<i class="bi bi-bell-slash"></i>';
+                        this.title = newState === 1 ? 'Tắt thông báo' : 'Bật thông báo';
+                        this.setAttribute('aria-label', this.title);
+                        bootstrap.Toast.getOrCreateInstance(document.getElementById('notiToast')).show();
+                    }
+                })
+                .catch(err => console.error('Lỗi bật/tắt thông báo:', err));
         });
     }
 
-    // Hàm phụ: Giảm số đếm trên cái Badge đỏ
-    function updateBadgeCount() {
-        let badge = document.querySelector('.noti-badge-new');
-        if (badge) {
-            let currentText = badge.textContent; // Ví dụ "2 mới"
-            let count = parseInt(currentText);
-            if (count > 1) {
-                badge.textContent = (count - 1) + ' mới';
-            } else {
-                badge.remove();
-            }
-        }
+    function updateUnreadCount() {
+        fetch('/helios/public/noti/unread-count')
+            .then(res => res.json())
+            .then(data => {
+                const count = parseInt(data.count, 10) || 0;
+                const text = count > 99 ? '99+' : count;
+                const badge = document.getElementById('totalUnreadBadge');
+                if (badge) {
+                    badge.textContent = text;
+                    badge.classList.toggle('d-none', count === 0);
+                }
+
+                const bellBadge = document.getElementById('notiBadge');
+                if (bellBadge) {
+                    bellBadge.textContent = text;
+                    bellBadge.style.display = count > 0 ? '' : 'none';
+                }
+            })
+            .catch(err => console.error('Lỗi cập nhật số lượng chưa đọc:', err));
     }
 
+    attachEventHandlers();
+    updateUnreadCount();
+    setInterval(updateUnreadCount, 30000);
 });
