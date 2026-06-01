@@ -4,7 +4,7 @@
 - Đề tài: Thiết kế và triển khai Website mạng xã hội - Helios
 
 ## Giới thiệu
-Trong bối cảnh chuyển đổi số và nhu cầu kết nối nghề nghiệp ngày càng tăng, việc xây dựng một nền tảng mạng xã hội hỗ trợ tìm kiếm việc làm và phát triển cộng đồng trở nên cần thiết. Đề tài này xây dựng một website mạng xã hội nghề nghiệp giúp người dùng dễ dàng tạo hồ sơ cá nhân, kết nối với cộng đồng, chia sẻ bài viết, tìm kiếm việc làm và ứng tuyển trực tuyến. Đồng thời, hệ thống hỗ trợ quản trị viên quản lý tài khoản, bài viết, tuyển dụng,...Hệ thống được phát triển dựa trên kiến thức môn Phát triển ứng dụng Web và ứng dụng các công cụ HTML, CSS, JavaScript, PHP và MySQL.
+Trong bối cảnh chuyển đổi số và nhu cầu kết nối nghề nghiệp ngày càng tăng, việc xây dựng một nền tảng mạng xã hội hỗ trợ tìm kiếm việc làm và phát triển cộng đồng trở nên cần thiết. Đề tài này xây dựng một website mạng xã hội nghề nghiệp giúp người dùng dễ dàng tạo hồ sơ cá nhân, kết nối với cộng đồng, chia sẻ bài viết, tìm kiếm việc làm. Đồng thời, hệ thống hỗ trợ quản trị viên quản lý tài khoản, bài viết, tuyển dụng,...Hệ thống được phát triển dựa trên kiến thức môn Phát triển ứng dụng Web và ứng dụng các công cụ HTML, CSS, JavaScript, PHP và MySQL.
 
 ## Giảng viên hướng dẫn
 TS. Đặng Ngọc Hoàng Thành
@@ -22,12 +22,12 @@ TS. Đặng Ngọc Hoàng Thành
 ## Mô tả và mục tiêu dự án
 ### Mô tả
 Helios là website mạng xã hội được xây dựng bằng PHP và MySQL, vận hành trên môi trường XAMPP. Hệ thống gồm 2 đối tượng người dùng chính:
-- **Người dùng:** Người dùng đã đăng ký có thể tạo hồ sơ cá nhân, kết nối và tương tác với người dùng khác, đăng bài chia sẻ, tìm kiếm việc làm và ứng tuyển trực tuyến.
+- **Người dùng:** Người dùng đã đăng ký có thể tạo hồ sơ cá nhân, kết nối và tương tác với người dùng khác, đăng bài chia sẻ, tìm kiếm việc làm trực tuyến.
 - **Quản trị viên:** Quản lý toàn bộ nội dung và hoạt động của hệ thống (bài viết, tài khoản,...), kiểm duyệt nội dung, theo dõi mức độ tương tác của người dùng và báo cáo thống kê.
 ### Mục tiêu
-- **Số hóa kết nối nghề nghiệp:** Thay thế việc tìm kiếm việc làm và networking truyền thống bằng nền tảng trực tuyến giúp người dùng dễ dàng kết nối, trao đổi và ứng tuyển.
+- **Số hóa kết nối nghề nghiệp:** Thay thế việc tìm kiếm việc làm và networking truyền thống bằng nền tảng trực tuyến giúp người dùng dễ dàng kết nối và trao đổi trực tuyến.
 - **Quản lý trực quan:** Xây dựng giao diện responsive, thân thiện với người dùng; cung cấp bảng điều khiển giúp quản trị viên dễ dàng quản lý tài khoản, bài viết, tuyển dụng và công ty.
-- **Tối ưu hóa trải nghiệm người dùng:** Hỗ trợ tạo hồ sơ cá nhân, đăng bài chia sẻ, tương tác, nhắn tin, tìm kiếm việc làm và ứng tuyển trực tuyến nhanh chóng.
+- **Tối ưu hóa trải nghiệm người dùng:** Hỗ trợ tạo hồ sơ cá nhân, đăng bài chia sẻ, tương tác, nhắn tin, tìm kiếm việc làm và xem chi tiết thông tin việc làm.
 - **Hỗ trợ ra quyết định:** Cung cấp thống kê về mức độ tương tác, số lượng người dùng, bài đăng và hoạt động tuyển dụng để quản trị viên đánh giá hiệu quả hệ thống và phát triển nền tảng.
   
 ## Kiến thức và công nghệ áp dụng:
@@ -50,7 +50,7 @@ Dự án áp dụng kiến thức lập trình web **3 tầng (MVC)** và sử d
 - **Quản lý hồ sơ cá nhân:** Cập nhật thông tin cá nhân, kỹ năng, học vấn, kinh nghiệm.
 - **Kết nối cộng đồng:** Kết nối hoặc tham gia các cộng đồng nghề nghiệp theo lĩnh vực quan tâm.
 - **Đăng bài & Tương tác:** Đăng bài chia sẻ kiến thức, hình ảnh, cảm xúc; tương tác thông qua lượt thích, bình luận và chia sẻ.
-- **Tìm kiếm việc làm** Tìm kiếm tin tuyển dụng theo địa điểm, công ty; gửi CV và ứng tuyển trực tuyến.
+- **Tìm kiếm việc làm** Tìm kiếm tin tuyển dụng theo địa điểm, công ty và xem chi tiết thông tin việc làm.
 - **Nhắn tin:** Trao đổi và kết nối trực tiếp giữa các người dùng.
 ### Dành cho Quản trị viên
 - **Quản lý tài khoản:** Thêm, chỉnh sửa hoặc xóa tài khoản người dùng.
