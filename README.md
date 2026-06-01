@@ -17,7 +17,6 @@ TS. Đặng Ngọc Hoàng Thành
 
 ## Báo cáo và demo sản phẩm
 - Báo cáo cuối kỳ: https://drive.google.com/drive/folders/12n4kC50EVJGB__SIJjog20Dv5Sa_qjQc
-- Web trải nghiệm: 
 - Demo ứng dụng Web: https://www.youtube.com/watch?v=Xyw86Yr2CFY 
   
 ## Mô tả và mục tiêu dự án
