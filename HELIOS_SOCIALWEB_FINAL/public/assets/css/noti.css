@@ -1,92 +1,89 @@
-/* =========================================
-   STYLE DÀNH RIÊNG CHO TRANG THÔNG BÁO (Tích hợp Bootstrap Layout)
-========================================= */
-
-/* Cột giữa (Chứa toàn bộ Thông báo) */
-.noti-center { 
-  display: flex; 
-  flex-direction: column; 
-  gap: 16px; /* Tạo khoảng hở rộng hơn cho giống Facebook */
-}
-
-/* Card Header (Khung chứa chữ Thông báo & Đánh dấu đã đọc) */
-.noti-header-card {
-  display: flex; 
-  align-items: center; 
-  justify-content: space-between;
-  background: #fff; 
-  padding: 16px 24px; 
-  border-radius: var(--helios-card-radius, 8px); 
-  border: 1px solid var(--helios-border, #d5e1f0); 
-  box-shadow: var(--helios-shadow, 0 1px 3px rgba(0,0,0,0.08));
-}
-
-.noti-header-left { display: flex; align-items: center; gap: 12px; }
-.noti-title { font-size: 20px; font-weight: 700; color: #050505; margin: 0; }
-
-.noti-badge-new {
-  background: #e41e3f; color: #fff; font-size: 12px; font-weight: 600;
-  border-radius: 6px; padding: 3px 8px; line-height: 1;
-}
-
-.noti-mark-all {
-  font-size: 14px; font-weight: 500; color: #0a66c2;
-  background: none; border: none; cursor: pointer; padding: 4px 8px; 
-  border-radius: 4px; transition: background 0.15s;
-}
-.noti-mark-all:hover { background: #f0f6ff; text-decoration: none; }
-
-/* Khung chứa Danh sách Thông báo */
-.noti-list-card {
-  background: #fff; 
-  border: 1px solid var(--helios-border, #d5e1f0);
-  border-radius: var(--helios-card-radius, 8px); 
+.noti-card {
+  border-radius: var(--helios-card-radius, 8px);
   overflow: hidden;
-  box-shadow: var(--helios-shadow, 0 1px 3px rgba(0,0,0,0.08));
+}
+
+.text-helios-navy {
+  color: var(--helios-navy, #062b6b) !important;
+}
+
+.bg-helios-navy,
+.btn-helios-navy {
+  background-color: var(--helios-navy, #062b6b) !important;
+  border-color: var(--helios-navy, #062b6b) !important;
+  color: #fff !important;
+}
+
+.btn-helios-navy:hover {
+  background-color: var(--helios-navy-bright, #073d96) !important;
+  border-color: var(--helios-navy-bright, #073d96) !important;
+  color: #fff !important;
+}
+
+.noti-header-icon-btn {
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.noti-action-btn {
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background: transparent;
+  border: none;
+}
+
+.noti-action-btn:hover i {
+  color: var(--helios-navy, #062b6b) !important;
+}
+
+.noti-tabs {
+  border-bottom: 1px solid var(--helios-border, #d5e1f0);
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.noti-tabs .nav-link {
+  color: var(--helios-navy, #062b6b);
+  border-radius: 8px 8px 0 0;
+  white-space: nowrap;
+}
+
+.noti-tabs .nav-link.active {
+  color: #111827;
+  background: #fff;
+  border-color: var(--helios-border, #d5e1f0) var(--helios-border, #d5e1f0) #fff;
 }
 
 .noti-item {
-  display: flex; align-items: flex-start; gap: 12px; padding: 16px 20px;
-  border-bottom: 1px solid #f0f2f5; transition: background 0.15s;
-  cursor: pointer; position: relative;
+  padding: 14px 20px;
+  border-color: #eef2f7;
+  cursor: pointer;
 }
-.noti-item:last-child { border-bottom: none; }
-.noti-item:hover { background: #f2f2f2; }
 
-/* Dấu hiệu chưa đọc (Đổi màu nền nhạt giống Facebook) */
-.noti-item.unread { background: #ebf5ff; }
-.noti-item.unread:hover { background: #e0eeff; }
-
-/* Vòng tròn Icon */
-.noti-icon-circle {
-  width: 56px; height: 56px; border-radius: 50%; display: flex;
-  align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0;
-  color: #fff;
+.noti-item.bg-light {
+  background-color: #f0f7ff !important;
 }
-/* Màu sắc Icon (Sửa lại cho đậm đà rực rỡ hơn) */
-.noti-icon-circle.green { background: #2e8b57; }
-.noti-icon-circle.pink { background: #e0245e; }
-.noti-icon-circle.blue { background: #0a66c2; }
-.noti-icon-circle.orange { background: #e68523; }
-.noti-icon-circle.purple { background: #6b3fa0; }
 
-.noti-body { flex: 1; min-width: 0; align-self: center; }
-.noti-body p { font-size: 15px; color: #050505; line-height: 1.4; margin: 0; }
-.noti-body p strong { font-weight: 600; }
-.noti-time { font-size: 13px; color: #65676b; margin-top: 6px; display: block; }
-
-.noti-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; align-self: center; }
-
-/* Nút xóa / đánh dấu */
-.noti-action-icon {
-  width: 36px; height: 36px; border-radius: 50%; background: none; border: 1px solid transparent;
-  cursor: pointer; display: flex; align-items: center; justify-content: center;
-  color: #65676b; font-size: 16px; transition: background 0.15s, border 0.15s;
+.noti-type-icon {
+  width: 44px;
+  height: 44px;
+  font-size: 18px;
 }
-.noti-action-icon:hover { background: #e4e6eb; color: #050505; border-color: #ccd0d5; }
 
-/* Chấm tròn báo hiệu chưa đọc */
-.noti-unread-dot {
-  width: 12px; height: 12px; border-radius: 50%; background: #0a66c2;
-  flex-shrink: 0;
+.noti-text {
+  color: #111827;
+  line-height: 1.4;
+}
+
+.noti-empty {
+  min-height: 160px;
 }
