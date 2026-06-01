@@ -101,22 +101,22 @@ class AuthController {
             $password = $_POST['password'] ?? '';
 
             if (empty($email) || empty($password)) {
-                $this->jsonResponse(false, 'Vui lòng nhập đầy đủ email và mật khẩu.'); // <-- Sửa lỗi
+                $this->jsonResponse(false, 'Vui lòng nhập đầy đủ email và mật khẩu.'); 
             }
 
             $userModel = new UserModel();
             $account = $userModel->findUserByEmail($email);
 
             if (!$account) {
-                $this->jsonResponse(false, 'Email hoặc mật khẩu không chính xác.'); // <-- Sửa lỗi
+                $this->jsonResponse(false, 'Email hoặc mật khẩu không chính xác.'); 
             }
             
             if ($account['TrangThai'] !== 'active') {
-                $this->jsonResponse(false, 'Tài khoản của bạn chưa được kích hoạt hoặc đã bị khóa.'); // <-- Sửa lỗi
+                $this->jsonResponse(false, 'Tài khoản của bạn chưa được kích hoạt hoặc đã bị khóa.'); 
             }
 
-            if (!password_verify($password, $account['MatKhau'])) { // <-- Kiểm tra mật khẩu (đã chuyển xuống đây)
-                $this->jsonResponse(false, 'Email hoặc mật khẩu không chính xác.'); // <-- Sửa lỗi
+            if (!password_verify($password, $account['MatKhau'])) { 
+                $this->jsonResponse(false, 'Email hoặc mật khẩu không chính xác.');
             }
 
             // Đăng nhập thành công
@@ -253,7 +253,7 @@ class AuthController {
 
         } else {
             $pageTitle = "Quên mật khẩu";
-            $jsFiles = ['auth.js']; // <-- BẮT BUỘC CÓ DÒNG NÀY ĐỂ LOAD JS
+            $jsFiles = ['auth.js'];
             $contentView = VIEW_PATH_APP . '/auth/forgot-password.php';
             include VIEW_PATH_APP . '/layouts/auth_layout.php';
         }
@@ -279,7 +279,7 @@ class AuthController {
                 $this->jsonResponse(false, "Token không hợp lệ hoặc đã hết hạn. Vui lòng thử lại yêu cầu quên mật khẩu.");
             }
 
-            $hashedPassword = password_hash($password, PASSWORD_BCRYPT); // Sửa lại thành PASSWORD_BCRYPT cho chuẩn hệ thống của bạn
+            $hashedPassword = password_hash($password, PASSWORD_DEFAULT); 
             
             if ($userModel->updatePassword($user['MaTaiKhoan'], $hashedPassword)) {
                 // Trả về JSON thành công
