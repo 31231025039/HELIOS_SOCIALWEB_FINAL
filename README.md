@@ -47,7 +47,7 @@ Dự án áp dụng kiến thức lập trình web **3 tầng (MVC)** và sử d
 
 ## Các chức năng chính
 ### Dành cho Khách/Thành viên
-- **Đăng ký & Đăng nhập:** Người dùng có thể tạo tài khoản, đăng nhập và hỗ trợ quên mật khẩu.
+- **Đăng ký & Đăng nhập:** Người dùng có thể tạo tài khoản, đăng nhập, khóa và hỗ trợ quên mật khẩu.
 - **Quản lý hồ sơ cá nhân:** Cập nhật thông tin cá nhân, kỹ năng, học vấn, kinh nghiệm.
 - **Kết nối cộng đồng:** Kết nối hoặc tham gia các cộng đồng nghề nghiệp theo lĩnh vực quan tâm.
 - **Đăng bài & Tương tác:** Đăng bài chia sẻ kiến thức, hình ảnh, cảm xúc; tương tác thông qua lượt thích, bình luận và chia sẻ.
