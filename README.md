@@ -51,7 +51,7 @@ Dự án áp dụng kiến thức lập trình web **3 tầng (MVC)** và sử d
 - **Quản lý hồ sơ cá nhân:** Cập nhật thông tin cá nhân, kỹ năng, học vấn, kinh nghiệm.
 - **Kết nối cộng đồng:** Kết nối hoặc tham gia các cộng đồng nghề nghiệp theo lĩnh vực quan tâm.
 - **Đăng bài & Tương tác:** Đăng bài chia sẻ kiến thức, hình ảnh, cảm xúc; tương tác thông qua lượt thích, bình luận và chia sẻ.
-- **Tìm kiếm việc làm** Tìm kiếm tin tuyển dụng theo địa điểm; gửi CV và ứng tuyển trực tuyến.
+- **Tìm kiếm việc làm** Tìm kiếm tin tuyển dụng theo địa điểm, công ty; gửi CV và ứng tuyển trực tuyến.
 - **Nhắn tin:** Trao đổi và kết nối trực tiếp giữa các người dùng.
 ### Dành cho Quản trị viên
 - **Quản lý tài khoản:** Thêm, chỉnh sửa hoặc xóa tài khoản người dùng.
