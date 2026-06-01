@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const $  = id => document.getElementById(id);
     const esc = s => s ? s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])) : '';
     const apiFetch = async (url, opts) => (await fetch(url, opts)).json();
-    const modalBody = () => $('modalBody');
+    const modalBody = () => $('detailModalBody');
 
     // ── Stats ────────────────────────────────────────────────────────────────
     function updateStats(s) {
