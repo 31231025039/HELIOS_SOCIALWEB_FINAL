@@ -12,4 +12,5 @@ jobs:
           server: ${{ secrets.FTP_HOST }}
           username: ${{ secrets.FTP_USER }}
           password: ${{ secrets.FTP_PASS }}
-          server-dir: /htdocs/helios/
+          local-dir: ./HELIOS_SOCIALWEB_FINAL/public/
+          server-dir: /htdocs/
