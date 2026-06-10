@@ -1,10 +1,8 @@
 <?php
 // File: public/index.php
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
 
 // Tự động nạp các thư viện từ Composer
-require_once __DIR__ . '/../vendor/autoload.php';
+require_once dirname(__DIR__) . '/vendor/autoload.php';
 
 // Luôn khởi động session ở đầu tiên
 if (session_status() === PHP_SESSION_NONE) {
@@ -19,7 +17,7 @@ define('JOBS_PER_PAGE', 4);
 define('VIEW_PATH_APP', APP_PATH . '/views');
 define('VIEW_PATH_ADMIN', ADMIN_PATH . '/views');
 
-$baseUrl = '/';
+$baseUrl = '/helios/public/';
 
 // Tạo URL base đầy đủ để dùng trong các link tuyệt đối (như email)
 $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http";
