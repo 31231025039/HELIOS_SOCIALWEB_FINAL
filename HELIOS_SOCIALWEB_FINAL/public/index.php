@@ -1,5 +1,7 @@
 <?php
 // File: public/index.php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
 // Tự động nạp các thư viện từ Composer
 require_once dirname(__DIR__) . '/vendor/autoload.php';
