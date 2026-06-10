@@ -7,6 +7,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - name: Install Composer dependencies
+        run: |
+          cd HELIOS_SOCIALWEB_FINAL
+          composer install --no-dev --optimize-autoloader
       - uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
           server: ${{ secrets.FTP_HOST }}
