@@ -17,7 +17,7 @@ define('JOBS_PER_PAGE', 4);
 define('VIEW_PATH_APP', APP_PATH . '/views');
 define('VIEW_PATH_ADMIN', ADMIN_PATH . '/views');
 
-$baseUrl = '/helios/public/';
+$baseUrl = '/';
 
 // Tạo URL base đầy đủ để dùng trong các link tuyệt đối (như email)
 $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http";
